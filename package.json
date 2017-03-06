@@ -13,6 +13,8 @@
     "supertest": "^3.0.0"
   },
   "dependencies": {
+    "bluebird": "^3.5.0",
+    "http-status-codes": "^1.1.6",
     "koa": "^2.0.1",
     "koa-combine-routers": "next",
     "koa-router": "^7.0.0"
