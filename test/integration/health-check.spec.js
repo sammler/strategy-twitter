@@ -1,4 +1,3 @@
-const server = require('supertest');
 const HttpStatus = require('http-status-codes');
 const supertest = require('supertest');
 const AppServer = require('./../../src/api/app-server');
