@@ -19,7 +19,8 @@
     "koa": "^2.0.1",
     "koa-combine-routers": "next",
     "koa-router": "^7.0.0",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "twit": "^2.2.5"
   },
   "engines": {
     "node": ">7.6.0"
