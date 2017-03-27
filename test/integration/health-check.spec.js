@@ -1,13 +1,14 @@
 const HttpStatus = require('http-status-codes');
 const supertest = require('supertest');
 const AppServer = require('./../../src/api/app-server');
+const testConfig = require('./../test-config');
 
 describe('HEALTH-CHECK', () => {
 
   let appServer;
   let server;
   beforeEach(() => {
-    appServer = new AppServer();
+    appServer = new AppServer(testConfig.SERVER);
     appServer.start();
     server = supertest(appServer.server);
   });

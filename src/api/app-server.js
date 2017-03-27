@@ -1,16 +1,16 @@
 const Koa = require('koa');
 const routes = require('./config/routes-config');
-const app = new Koa();
 
 class App {
-  constructor() {
+  constructor( config ) {
+    this.config = config;
     this.app = new Koa();
     this.app.use(routes);
     this.server = null;
   }
 
   start() {
-    this.server = this.app.listen(3000);
+    this.server = this.app.listen(this.config.PORT);
   }
 
   stop() {
