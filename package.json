@@ -2,38 +2,21 @@
   "name": "strategy-twitter",
   "version": "0.1.0",
   "description": "Sammler.io strategy for twitter.",
+  "license": "MIT",
+  "author": "Stefan Walther",
   "main": "index.js",
   "repository": "git@github.com:sammler/strategy-twitter.git",
-  "author": "Stefan Walther",
-  "license": "MIT",
-  "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint": "^3.17.0",
-    "eslint-config-space-single": "^0.0.5",
-    "mocha": "^3.2.0",
-    "supertest": "^3.0.0"
+  "scripts": {
+    "dc-down:dev": "docker-compose --f=./docker-compose.dev.yml down",
+    "dc-up:dev": "docker-compose --f=./docker-compose.dev.yml up --build",
+    "docs": "docker run --rm -v ${PWD}:/opt/verb stefanwalther/verb"
   },
   "dependencies": {
-    "bluebird": "^3.5.0",
-    "http-status-codes": "^1.1.6",
-    "koa": "^2.0.1",
-    "koa-combine-routers": "next",
-    "koa-router": "^7.0.0",
-    "lodash": "^4.17.4",
-    "mongoose": "^4.8.6",
-    "mongoose-timestamp": "^0.6.0",
-    "twit": "^2.2.5"
+  },
+  "devDependencies": {
   },
   "engines": {
-    "node": ">7.6.0"
-  },
-  "scripts": {
-    "start": "node ./index.js",
-    "start:dev": "nodemon ./index.js",
-    "d-build": "docker build -t sammler/auth-service .",
-    "dc-dev-up": "docker-compose --f=./docker-compose.dev.yml up",
-    "dc-dev-up-d": "docker-compose --f=./docker-compose.dev.yml up -d",
-    "dc-dev-down": "docker-compose --f=./docker-compose.dev.yml down"
+    "node": ">8.4.0"
   },
   "verb": {
     "run": true,

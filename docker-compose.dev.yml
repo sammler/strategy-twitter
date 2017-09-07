@@ -4,4 +4,25 @@ services:
   mongo:
     image: mongo
     ports:
-      - 27017:27017
+      - "27017:27017"
+    expose:
+      - 27017
+  api:
+    build:
+      context: ./services/api
+    ports:
+      - "3000:3000"
+    command: ["npm", "run", "start:dev"]
+    depends_on:
+      - mongo
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - SAMMLER_DB_URI_TWITTER=mongodb://mongo:27017
+      - TWITTER_CONSUMER_KEY=$S5R_STRATEGY_TWITTER__CONSUMER_KEY
+      - TWITTER_CONSUMER_SECRET=$S5R_STRATEGY_TWITTER__CONSUMER_SECRET
+      - TWITTER_ACCESS_TOKEN=$S5R_STRATEGY_TWITTER__ACCESS_TOKEN
+      - TWITTER_ACCESS_TOKEN_SECRET=$S5R_STRATEGY_TWITTER__ACCESS_TOKEN_SECRET
+    volumes:
+      - "./services/api:/home/app"
+
