@@ -12,9 +12,9 @@
     "docs": "docker run --rm -v ${PWD}:/opt/verb stefanwalther/verb",
     "precommit": "npm run docs"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
+    "husky": "^0.14.3"
   },
   "engines": {
     "node": ">8.4.0"
