@@ -6,17 +6,32 @@ const UsersModel = require('./users.model').Model;
 class UsersBL {
 
   /**
-   * Get a user from Twitter.
-   *
-   * @param query
-   * @param twitConfig
+   * Return an array of followers for the given user.
    */
-  static getTwitUser(query, twitConfig) {
+  static getTwitFollowersIds(twitOptions, twitConfig) {
 
     let c = twitConfig || defaultTwitterConfig;
 
     let twit = new Twit(c);
-    return twit.get('/users/show', query);
+    return twit.get('/followers/ids', twitOptions)
+
+  };
+
+  /**
+   * Get a user from Twitter.
+   *
+   * @param twitOptions
+   * @param twitOptions.screen_name
+   *
+   *
+   * @param twitConfig - The Twitter auth configuration, defaults to the app-wide Twitter-authentication settings (as defined in ./config/twitter-config resp. by environment variables.
+   */
+  static getTwitUser(twitOptions, twitConfig) {
+
+    let c = twitConfig || defaultTwitterConfig;
+
+    let twit = new Twit(c);
+    return twit.get('/users/show', twitOptions);
   }
 
   /**
@@ -46,6 +61,10 @@ class UsersBL {
       screen_name: twitUser.screen_name,
       profile: twitUser
     };
+  }
+
+  static getUnfollowers() {
+
   }
 
   /**

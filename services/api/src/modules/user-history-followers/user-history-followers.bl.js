@@ -3,6 +3,8 @@ const Lib = require('./../../lib');
 
 class UserHistoryFollowersBL {
 
+
+
   /**
    * Inserts or updates a new user-history-followers entry.
    *
@@ -35,7 +37,6 @@ class UserHistoryFollowersBL {
 
         }
       })
-
   }
 
   /**
@@ -60,6 +61,37 @@ class UserHistoryFollowersBL {
   static getActiveFollowers(twitter_id) {
     return UserHistoryFollowersModel
       .find({twitter_id: twitter_id, end_date: null})
+  }
+
+  /**
+   * Get those users who followed and at un-followed (does not indicate if the have re-followed)
+   * @param twitter_id
+   */
+  static getUnFollowers(twitter_id) {
+    return UserHistoryFollowersModel
+      .find({twitter_id: twitter_id, end_date: {$ne: null}})
+  };
+
+  /**
+   * Get thoe users who followed you, then un-followed, but never re-followed.
+   *
+   * @param twitter_id
+   */
+  static getLostFollowers(twitter_id) {
+    throw new Error('Not implemented');
+  }
+
+  // Todo: This needs to be implemented
+  static getFollowerStatsPerDay(user_id) {
+    throw new Error('Not implemented');
+  }
+
+  /**
+   * Get those who started to follow, then un-followed, but re-followed again.
+   * (This is an interesting group of people!).
+   */
+  static getUnDecidedFollwers() {
+    throw new Error('Not implemented');
   }
 
 

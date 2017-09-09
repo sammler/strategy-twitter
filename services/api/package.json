@@ -27,6 +27,7 @@
     "express-result": "^0.1.1",
     "find-pkg": "^1.0.0",
     "http-status-codes": "^1.2.0",
+    "increase-memory-limit": "^1.0.3",
     "js-yaml": "^3.9.1",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",

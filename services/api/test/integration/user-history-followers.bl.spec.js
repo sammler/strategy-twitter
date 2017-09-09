@@ -92,6 +92,7 @@ describe('Integration => user-history-followers.bl', () => {
       .then(UserHistoryFollowersBL.removeFollower.bind(null, mockData))
   });
 
+  // Todo: Check: Is this really finished?
   it('bl.upsertFollower => Only updates last_check on docs without an end_date', () => {
 
     let lastCheck1 = null;
@@ -131,36 +132,67 @@ describe('Integration => user-history-followers.bl', () => {
    * - user:2 is unfollowed by follower:10
    * - user:2 is followed by follower: 10 (re-follow scenario => should be a new record)
    *
+   * - user:3 is followed by follower:20
+   * - user:3 is followed by follower:21
+   * - user:3 is unfollowed by follower:20
+   * - user:3 is followed by follower:20
+   * - user:3 is followed by follower:22
+   *
    * Result:
    * -> user:1 should have active followers: 1
+   * -> user:1 should have unfollowers: 0
+   *
    * -> user:2 should have active followers: 2
+   * -> user:2 should have unfollowers: 0
+   *
+   * -> user:3 should have active followers: 3
+   * -> user:3 should have unfollowers: 0
+   *
    * -> We should have records in total: 5
    *
    */
-  it("OK, let's stress test it ...", () => {
+  it.only("OK, let's stress test it ...", () => {
 
     return UserHistoryFollowersBL
       .upsertFollower({twitter_id: 1, follower_id:1})
+
+      // User:1
       .then(UserHistoryFollowersBL.upsertFollower.bind(null, {twitter_id: 1, follower_id: 3}))
 
+      // User:2
       .then(UserHistoryFollowersBL.upsertFollower.bind(null, {twitter_id: 2, follower_id: 10}))
       .then(UserHistoryFollowersBL.upsertFollower.bind(null, {twitter_id: 2, follower_id: 11}))
       .then(UserHistoryFollowersBL.removeFollower.bind(null, {twitter_id: 2, follower_id: 10}))
       .then(UserHistoryFollowersBL.upsertFollower.bind(null, {twitter_id: 2, follower_id: 10}))
 
+      // User: 3
+      .then(UserHistoryFollowersBL.upsertFollower.bind(null, {twitter_id: 3, follower_id: 20}))
+      .then(UserHistoryFollowersBL.upsertFollower.bind(null, {twitter_id: 3, follower_id: 21}))
+      .then(UserHistoryFollowersBL.removeFollower.bind(null, {twitter_id: 3, follower_id: 20}))
+      .then(UserHistoryFollowersBL.upsertFollower.bind(null, {twitter_id: 3, follower_id: 20}))
+      .then(UserHistoryFollowersBL.upsertFollower.bind(null, {twitter_id: 3, follower_id: 22}))
+
       // Validation user:1
       .then(UserHistoryFollowersBL.getActiveFollowers.bind(null, 1))
       .then(docs => expect(docs).to.be.of.length(2))
+      .then(UserHistoryFollowersBL.getUnFollowers.bind(null, 1))
 
       // Validation user:2
       .then(UserHistoryFollowersBL.getActiveFollowers.bind(null, 2))
       .then(docs => expect(docs).to.be.of.length(2))
+      .then(UserHistoryFollowersBL.getUnFollowers.bind(null, 2))
+
+      // Validation user:3
+      .then(UserHistoryFollowersBL.getActiveFollowers.bind(null,3))
+      .then(docs => expect(docs).to.be.of.length(3))
+      .then(UserHistoryFollowersBL.getUnFollowers.bind(null,3))
+      .then(docs => expect(docs).to.be.of.length(0))
 
       // Records in total
       .then(UserHistoryFollowersBL.count)
-      .then(count => expect(count).to.be.equal(5))
-
-
+      .then(count => expect(count).to.be.equal(5));
   });
+
+
 
 });

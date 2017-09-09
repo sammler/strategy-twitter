@@ -16,6 +16,4 @@ Just a prototype so far.
   - [ ] Enable CodeCov
   - [ ] Running tests in a temporary container
 - [ ] OpenAPI
-- API
-  - [ ] Convert all timestamps to be UTC
 
