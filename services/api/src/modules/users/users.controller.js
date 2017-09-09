@@ -1,23 +1,20 @@
-const findPkg = require('find-pkg');
-const pkg = require(findPkg.sync('.'));
 const ExpressResult = require('express-result');
 
 const UsersBL = require('./users.bl');
 
 class UsersController {
 
-  static getByScreenName (req, res) {
+  static getByScreenName(req, res) {
     return UsersBL.getTwitUser({screen_name: req.params.id})
       .then(result => ExpressResult.ok(res, result))
       .catch(err => ExpressResult.error(res, err));
   }
 
-  static getById (req, res) {
+  static getById(req, res) {
     return UsersBL.getTwitUser({id: req.params.id})
       .then(result => ExpressResult.ok(res, result))
       .catch(err => ExpressResult.error(res, err));
   }
-
 
 }
 

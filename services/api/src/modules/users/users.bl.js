@@ -29,7 +29,7 @@ class UsersBL {
     let data = UsersBL.twitToModel(twitUser);
 
     return UsersModel
-      .findOneAndUpdate({twitter_id: data.twitter_id}, data, { new: true, upsert: true, setDefaultsOnInsert: true})
+      .findOneAndUpdate({twitter_id: data.twitter_id}, data, {new: true, upsert: true, setDefaultsOnInsert: true})
       .exec();
 
   }
@@ -46,6 +46,15 @@ class UsersBL {
       screen_name: twitUser.screen_name,
       profile: twitUser
     };
+  }
+
+  /**
+   * Remove all users.
+   */
+  static removeAll() {
+    return UsersModel
+      .remove({})
+      .exec();
   }
 
 }

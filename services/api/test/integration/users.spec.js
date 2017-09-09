@@ -8,7 +8,7 @@ const pkg = require(findPkg.sync('.'));
 
 const UsersBL = require('./../../src/modules/users/users.bl');
 
-describe.only('Integration => users', () => {
+describe('Integration => users', () => {
 
   let server;
   const appServer = new AppServer(testConfig);
@@ -21,6 +21,10 @@ describe.only('Integration => users', () => {
 
   after(() => {
     return appServer.stop();
+  });
+
+  beforeEach(() => {
+    return UsersBL.removeAll();
   });
 
   it('GET /v1/twit/users/:id return a user by screen_name', () => {
@@ -46,8 +50,7 @@ describe.only('Integration => users', () => {
       });
   });
 
-
-  it('bl.save => inserts the user if not existing (authorized user)', () => {
+  it('bl.upsert => inserts the user if not existing (authorized user)', () => {
     const screen_name = 'waltherstefan';
     return UsersBL.getTwitUser({screen_name: screen_name})
       .then(result => {
@@ -60,7 +63,7 @@ describe.only('Integration => users', () => {
       })
   });
 
-  it('bl.save => inserts the user if not existing (non-authorized user)', () => {
+  it('bl.upsert => inserts the user if not existing (non-authorized user)', () => {
     const screen_name = 'qlik';
     return UsersBL.getTwitUser({screen_name: screen_name})
       .then(result => {
@@ -73,8 +76,7 @@ describe.only('Integration => users', () => {
       })
   });
 
-
-  it('bl.save => updates the user if existing', () => {
+  it('bl.upsert => updates the user if existing', () => {
     return UsersBL.getTwitUser({screen_name: 'waltherstefan'})
       .then(result => {
         // console.log('data', result.data);
@@ -86,5 +88,4 @@ describe.only('Integration => users', () => {
           })
       })
   });
-
 });
