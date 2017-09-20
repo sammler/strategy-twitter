@@ -8,6 +8,8 @@ log-test.log
 .idea
 /**/.npm
 
+docker-compose.stage.yml
+
 # always ignore files
 *.DS_Store
 *.sublime-*

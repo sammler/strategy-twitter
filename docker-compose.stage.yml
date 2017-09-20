@@ -1,0 +1,28 @@
+version: '3.3'
+services:
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    expose:
+     - 27017
+
+  strategy-twitter-api:
+    build:
+      context: ./services/api
+    ports:
+      - "3000:3000"
+    command: ["npm", "run", "start"]
+    depends_on:
+      - mongo
+    environment:
+      - PORT=3000
+      - NODE_ENV=dev
+      - MONGODB_HOST=mongo
+      - MONGODB_PORT=27017
+      - MONGODB_DATABASE=SAMMLER_STRATEGY_TWITTER--DEV
+      - TWITTER_CONSUMER_KEY=$S5R_STRATEGY_TWITTER__CONSUMER_KEY
+      - TWITTER_CONSUMER_SECRET=$S5R_STRATEGY_TWITTER__CONSUMER_SECRET
+      - TWITTER_ACCESS_TOKEN=$S5R_STRATEGY_TWITTER__ACCESS_TOKEN
+      - TWITTER_ACCESS_TOKEN_SECRET=$S5R_STRATEGY_TWITTER__ACCESS_TOKEN_SECRET

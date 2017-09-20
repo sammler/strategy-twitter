@@ -1,33 +1,54 @@
 version: '2'
 services:
 
-  mongo:
-    image: mongo
+  mongodb:
+    image: "mongo:latest"
+    container_name: mongodb
+    environment:
+      - DOCKER_LABELS=true
     ports:
       - "27017:27017"
     expose:
       - 27017
+
+  rabbitmq:
+    image: rabbitmq:3.6.6-management
+    container_name: rabbitmq
+    ports:
+      - "8080:15672"
+      - "5672:5672"
+
+  scheduler-service:
+    image: sammlerio/scheduler-service
+    container_name: scheduler-service
+    environment:
+      - SAMMLER_RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
+#      - SAMMLER_JOBS_SERVICE_URI=http://jobs-service:3003
+    command: npm run start
 
   api:
     build:
       context: ./services/api
     ports:
       - "3000:3000"
-    command: ["npm", "run", "start:dev"]
     depends_on:
-      - mongo
+      - mongodb
+      - rabbitmq
     environment:
       - PORT=3000
-      - NODE_ENV=dev
-      - MONGODB_HOST=mongo
+      - MONGODB_HOST=mongodb
       - MONGODB_PORT=27017
       - MONGODB_DATABASE=SAMMLER_STRATEGY_TWITTER--DEV
+      - SAMMLER_RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
       - TWITTER_CONSUMER_KEY=$S5R_STRATEGY_TWITTER__CONSUMER_KEY
       - TWITTER_CONSUMER_SECRET=$S5R_STRATEGY_TWITTER__CONSUMER_SECRET
       - TWITTER_ACCESS_TOKEN=$S5R_STRATEGY_TWITTER__ACCESS_TOKEN
       - TWITTER_ACCESS_TOKEN_SECRET=$S5R_STRATEGY_TWITTER__ACCESS_TOKEN_SECRET
     volumes:
       - "./services/api:/home/app"
+    command: ["npm", "run", "start:dev"]
+
+
 
 #  api-test:
 #    build:
@@ -36,7 +57,7 @@ services:
 #    ports:
 #      - "3001:3000"
 #    depends_on:
-#      - mongo
+#      - mongodb
 #    environment:
 #      - PORT=3001
 #      - NODE_ENV=dev
