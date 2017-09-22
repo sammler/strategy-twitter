@@ -1,0 +1,13 @@
+version: '2'
+services:
+
+  mongodb:
+    image: "mongo:latest"
+    container_name: mongodb
+    environment:
+      - DOCKER_LABELS=true
+    ports:
+      - "27017:27017"
+    expose:
+      - 27017
+

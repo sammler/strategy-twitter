@@ -1,0 +1,5 @@
+## Configuration Options
+
+- MONGODB_HOST
+- MONGODB_PORT
+- MONGODB_DATABASE

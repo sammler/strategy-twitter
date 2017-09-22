@@ -17,6 +17,8 @@ services:
     ports:
       - "8080:15672"
       - "5672:5672"
+    logging:
+      driver: none
 
   scheduler-service:
     image: sammlerio/scheduler-service
@@ -24,11 +26,14 @@ services:
     environment:
       - SAMMLER_RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
 #      - SAMMLER_JOBS_SERVICE_URI=http://jobs-service:3003
-    command: npm run start
+    command: ["npm", "run", "start:watch"]
+    volumes:
+      - ./node_modules/scheduler-service:/home
 
-  api:
+  strategy-twitter:
     build:
-      context: ./services/api
+      context: .
+    container_name: strategy-twitter
     ports:
       - "3000:3000"
     depends_on:
@@ -45,8 +50,8 @@ services:
       - TWITTER_ACCESS_TOKEN=$S5R_STRATEGY_TWITTER__ACCESS_TOKEN
       - TWITTER_ACCESS_TOKEN_SECRET=$S5R_STRATEGY_TWITTER__ACCESS_TOKEN_SECRET
     volumes:
-      - "./services/api:/home/app"
-    command: ["npm", "run", "start:dev"]
+      - "./src:/home/src"
+    command: ["npm", "run", "start:watch"]
 
 
 
