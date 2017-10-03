@@ -37,10 +37,10 @@ class AmqpSugarLib {
 
         conn.on('error', err => {
           console.error('OK, we got an error with the connection in subscribeMessage', err);
-          return promiseRetry((retry, number) => {
+          return promiseRetry((/* retry, number */) => {
             // Todo: These logs are not shown ?
-            logger.verbose(`Trying to re-subscribe to the message`);
-            console.log(`Trying to re-subscribe to the message`);
+            logger.verbose('Trying to re-subscribe to the message');
+            console.log('Trying to re-subscribe to the message');
             return AmqpSugarLib.subscribeMessage(opts);
           });
         });
@@ -82,8 +82,6 @@ class AmqpSugarLib {
 
     // Merge opts with default params
     opts = _.defaults(opts, default_retry_behavior);
-
-    console.log('opts', opts);
 
     return promiseRetry((retry, number) => {
 

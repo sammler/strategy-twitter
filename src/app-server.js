@@ -9,17 +9,14 @@ const routesConfig = require('./config/routes-config');
 // Todo: has to be (re)moved ...
 const RABBITMQ_URI = process.env.SAMMLER_RABBITMQ_URI || 'amqp://guest:guest@localhost:5672';
 
-// Todo: This is a big construction area, needs to be resolved ... ?? in a general repo handling that?
-const configDefault = require('./config/config');
+const defaultConfig = require('./config/config');
 
 class AppServer {
   constructor(config) {
-    // console.log('config:before', config);
-    this.config = _.defaults(config, configDefault);
-    // console.log('config:after', this.config);
+    this.config = _.defaults(config || {}, defaultConfig);
     this.server = null;
     this.logger = logger;
-    // this.logger.info('mongoose connection', this.config.MONGOOSE_CONNECTION);
+    // Todo: We should not do that, injecting something here ...
     this.mongooseConnection = new MongooseConnection(this.config.MONGOOSE_CONNECTION || MongooseConnection.DEFAULT_OPTIONS);
     this._initApp();
   }
@@ -41,7 +38,7 @@ class AppServer {
   _initSubscribers() {
 
     const opts = {
-      server: RABBITMQ_URI,
+      server: this.config.RABBITMQ_URI,
       exchange: {
         type: 'topic',
         name: 'system'
@@ -52,12 +49,23 @@ class AppServer {
     amqpSugar.subscribeMessage(opts);
   }
 
+  /**
+   * Initializes the Mongoose connection
+   * @returns {Promise|Promise.<TResult>}
+   */
+  _initDB() {
+    return this.mongooseConnection.connect()
+      .then(connection => this.app.db = connection)
+      .catch(err => {
+        this.logger.fatal('An error occurred connecting to MongoDB', err);
+      })
+  }
+
   start() {
     return new Promise((resolve, reject) => {
 
-      this.mongooseConnection.connect()
-        .then(connection => {
-          this.app.db = connection;
+      this._initDB()
+        .then(() => {
           this.server = this.app.listen(this.config.PORT, err => {
             if (err) {
               this.logger.error('Cannot start express server', err);
@@ -79,7 +87,9 @@ class AppServer {
   stop() {
     this.mongooseConnection.disconnect()
       .then(() => {
-        this.server.close();
+        if (this.server) {
+          this.server.close();
+        }
       })
       .catch(err => this.logger.error(err));
   }

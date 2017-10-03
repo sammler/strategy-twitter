@@ -1,21 +1,16 @@
-const express = require('express');
+const logger = require('winster').instance();
+const path = require('path');
+const glob = require('glob');
 
-// Todo: If we continue to follow the pattern, we could start doing this automatically.
-const healthCheckRoutes = require('./../modules/health-check/health-check.routes');
-const followerRoutes = require('./../modules/followers/followers.routes');
-const usersRoutes = require('./../modules/users/users.routes');
-
+// Load routes based on the pattern './../modules/**/*.routes.js
 function init(app) {
-  const router = express.Router(); // eslint-disable-line new-cap
 
-  // /health-check
-  app.use('/', healthCheckRoutes);
-
-  app.use('/', followerRoutes);
-
-  app.use('/', usersRoutes);
-
-  app.use('/', router);
+  let routes = glob.sync(path.join(__dirname, './../modules/**/*.routes.js'));
+  routes.forEach(r => {
+    logger.trace('Registering route', r);
+    let route = require(r);
+    app.use('/', route);
+  });
 }
 
 module.exports = {

@@ -1,8 +1,6 @@
 module.exports = {
   // Todo: not being reflected right now !!!
-  SERVER: {
-    PORT: 3000
-  },
+  PORT: 3000,
   MONGOOSE_CONNECTION: {
     debug: false,
     host: process.env.MONGODB_HOST || 'localhost',
@@ -19,5 +17,6 @@ module.exports = {
       auth: {},
       mongos: {}
     }
-  }
+  },
+  TEST_MODE: 'server'
 };

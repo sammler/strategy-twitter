@@ -1,0 +1,32 @@
+version: '2'
+services:
+
+  mongodb:
+    image: "mongo:latest"
+    container_name: mongodb
+    environment:
+      - DOCKER_LABELS=true
+    ports:
+      - "27017:27017"
+    expose:
+      - 27017
+
+  rabbitmq:
+    image: rabbitmq:3.6.6-management
+    container_name: rabbitmq
+    ports:
+      - "8080:15672"
+      - "5672:5672"
+    logging:
+      driver: none
+
+  scheduler-service:
+    image: sammlerio/scheduler-service
+    container_name: scheduler-service
+    environment:
+      - SAMMLER_RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
+#      - SAMMLER_JOBS_SERVICE_URI=http://jobs-service:3003
+    command: ["npm", "run", "start:watch"]
+    volumes:
+      - ./node_modules/scheduler-service:/opt/scheduler-service
+

@@ -1,17 +1,22 @@
-const AppServer = require('./../../src/app-server');
-const testConfig = require('./../test-config');
-
+const testLib = require('./../lib');
 const UsersBL = require('./../../src/modules/users/users.bl');
 
 describe('Integration => users', () => {
 
-  const appServer = new AppServer(testConfig);
+  let server;
+  let appServer;
   before(() => {
-    return appServer.start();
+    return testLib.init('db-only').then(result => {
+      server = result.superTest;
+      appServer = result.appServer;
+    })
   });
 
   after(() => {
-    return appServer.stop();
+    if (appServer) {
+      return appServer.stop();
+    }
+    return Promise.resolve();
   });
 
   beforeEach(() => {

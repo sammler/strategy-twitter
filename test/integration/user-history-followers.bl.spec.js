@@ -1,10 +1,8 @@
-const AppServer = require('./../../src/app-server');
-const testConfig = require('./../test-config');
 const _ = require('lodash');
 const moment = require('moment');
 
 const UserHistoryFollowersBL = require('./../../src/modules/user-history-followers/user-history-followers.bl');
-const Lib = require('./../../src/lib');
+const testLib = require('./../lib');
 
 describe('Integration => user-history-followers.bl', () => {
 
@@ -17,14 +15,20 @@ describe('Integration => user-history-followers.bl', () => {
     follower_id: 3
   };
 
-  const appServer = new AppServer(testConfig);
+  let appServer;
   before(() => {
-    return appServer.start();
+    return testLib.init('db-only').then(result => {
+      appServer = result.appServer;
+    })
   });
 
   after(() => {
-    return appServer.stop();
+    if (appServer) {
+      return appServer.stop();
+    }
+    return Promise.resolve();
   });
+
 
   beforeEach(() => {
     return UserHistoryFollowersBL.removeAll();
@@ -192,5 +196,4 @@ describe('Integration => user-history-followers.bl', () => {
       .then(UserHistoryFollowersBL.count)
       .then(count => expect(count).to.be.equal(5));
   });
-
 });

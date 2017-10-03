@@ -1,6 +1,5 @@
 /* eslint-disable max-nested-callbacks */
-const AppServer = require('./../../src/app-server');
-const testConfig = require('./../test-config');
+const testLib = require('./../lib');
 const _ = require('lodash');
 
 const UserHistoryBL = require('./../../src/modules/user-history/user-history.bl');
@@ -17,13 +16,18 @@ describe('Integration => user-history.bl', () => {
     followers_count: 5
   };
 
-  const appServer = new AppServer(testConfig);
+  let appServer;
   before(() => {
-    return appServer.start();
+    return testLib.init('db-only').then(result => {
+      appServer = result.appServer;
+    })
   });
 
   after(() => {
-    return appServer.stop();
+    if (appServer) {
+      return appServer.stop();
+    }
+    return Promise.resolve();
   });
 
   beforeEach(() => {

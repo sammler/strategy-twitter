@@ -1,16 +1,6 @@
-const AppServer = require('./../../src/app-server');
-const testConfig = require('./../test-config');
 const RateLimitStatusBL = require('./../../src/modules/rate-limit-status/rate-limit-status.bl');
 
 describe('rate-limit-status.bl', () => {
-  const appServer = new AppServer(testConfig);
-  before(() => {
-    return appServer.start();
-  });
-
-  after(() => {
-    return appServer.stop();
-  });
 
   it('get it (default app-auth)', () => {
     return RateLimitStatusBL.getTwitRateLimitStatus()

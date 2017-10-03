@@ -1,6 +1,6 @@
 const AppServer = require('./app-server');
-const defaultConfig = require('./config/config-default');
+const config = require('./config/config');
 
-let app = new AppServer(defaultConfig);
+let app = new AppServer(config);
 app.start();
 
