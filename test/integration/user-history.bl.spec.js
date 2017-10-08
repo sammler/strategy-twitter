@@ -20,7 +20,7 @@ describe('Integration => user-history.bl', () => {
   before(() => {
     return testLib.init('db-only').then(result => {
       appServer = result.appServer;
-    })
+    });
   });
 
   after(() => {

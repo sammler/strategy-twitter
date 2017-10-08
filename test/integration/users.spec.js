@@ -12,7 +12,7 @@ xdescribe('Integration:REST => users', () => {
   before(() => {
     return testLib.init('rest').then(result => {
       appServer = result.appServer;
-    })
+    });
   });
 
   after(() => {
@@ -21,7 +21,6 @@ xdescribe('Integration:REST => users', () => {
     }
     return Promise.resolve();
   });
-
 
   beforeEach(() => {
     return UsersBL.removeAll();
@@ -49,10 +48,5 @@ xdescribe('Integration:REST => users', () => {
         expect(result.body.data).to.have.property('screen_name').to.be.equal(screen_name);
       });
   });
-
-
-
-
-
 
 });

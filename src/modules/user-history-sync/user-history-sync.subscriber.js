@@ -1,6 +1,5 @@
 const AmqpSugar = require('./../../lib/amqplib-sugar');
 const config = require('./../../config/config');
-const logger = require('winster').instance();
 const UserHistorySyncBL = require('./user-history-sync.bl');
 
 class UserHistorySyncSubscriber {

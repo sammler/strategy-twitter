@@ -11,7 +11,7 @@ describe('Integration => users.bl', () => {
   before(() => {
     return testLib.init('db-only').then(result => {
       appServer = result.appServer;
-    })
+    });
   });
 
   after(() => {

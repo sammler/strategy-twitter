@@ -9,7 +9,7 @@ describe('Integration => users', () => {
     return testLib.init('db-only').then(result => {
       server = result.superTest;
       appServer = result.appServer;
-    })
+    });
   });
 
   after(() => {

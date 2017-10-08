@@ -5,9 +5,6 @@ const _ = require('lodash');
 const defaultConfigs = require('./../../node_modules/amqplib-sugar/src/config/default-configs');
 const Joi = require('joi');
 
-// Todo(AAA): Remove, just for debugging purposes !!!
-// const UserSyncBL = require('./../modules/user-sync/user-sync.bl');
-
 function encode(doc) {
   return new Buffer(JSON.stringify(doc));
 }
@@ -91,12 +88,8 @@ class AmqpSugarLib {
   // eslint-disable-next-line no-unused-vars
   static subscribeMessage(opts, fn) {
 
-    let connection = null;
-
     return AmqpSugarLib._connect(opts)
       .then(conn => {
-
-        connection = conn;
 
         logger.verbose('subscribeMessage => we have a channel');
 
@@ -131,11 +124,11 @@ class AmqpSugarLib {
                 .catch(err => {
                   logger.trace(`[AMQP] nack => ${opts.queue.name}`, err);
                   channel.nack(msg);
-                })
+                });
             }
 
           }, {noAck: false})
-        ])
+        ]);
       })
       .catch(err => {
         logger.error('Cannot connect to RabbitMQ', err);

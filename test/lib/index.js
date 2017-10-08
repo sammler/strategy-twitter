@@ -2,7 +2,6 @@ const AppServer = require('./../../src/app-server');
 const testConfig = require('./../test-config');
 const superTest = require('supertest');
 
-
 const _initServer = () => {
   const appServer = new AppServer(testConfig);
   return appServer.start()
@@ -36,7 +35,7 @@ const _initDBOnly = () => {
     });
 };
 
-const init = (testMode) => {
+const init = testMode => {
 
   let mode = testMode || testConfig.TEST_MODE;
 

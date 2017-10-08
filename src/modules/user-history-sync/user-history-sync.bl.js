@@ -1,10 +1,8 @@
 const config = require('./../../config/config');
-const logger = require('winster').instance();
 const moment = require('moment');
 
 const UsersBL = require('./../users/users.bl');
 const UserHistoryBL = require('./../user-history/user-history.bl');
-const UserHistoryModel = require('./../user-history/user-history.model').Model;
 
 class UserHistorySyncBl {
 
@@ -55,7 +53,7 @@ class UserHistorySyncBl {
     console.log('Rec:howOld: ', UserHistorySyncBl.howOld(user, 'last_sync_ts', 'hours'));
     if (user && UserHistorySyncBl.howOld(user, 'last_sync_ts', 'hours') > UserHistorySyncBl.SYNC_USER_HISTORY_INTERVAL) {
       console.log('Rec is older', user.last_sync_ts);
-      //Todo: OK, get rec from twitter
+      // Todo: OK, get rec from twitter
       user = UsersBL.getTwitUser({screen_name: opts.screen_name});
     } else {
       console.log('Rec is fine', user.last_sync_ts);

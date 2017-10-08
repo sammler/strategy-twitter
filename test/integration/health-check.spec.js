@@ -10,7 +10,7 @@ describe('Integration => health-check', () => {
   before(() => {
     return testLib.init('rest').then(result => {
       server = result.superTest;
-    })
+    });
   });
 
   it('returns OK and a timestamp', () => {

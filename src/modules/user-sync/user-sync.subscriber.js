@@ -11,7 +11,7 @@ class UserSyncSubscriber {
   }
 
   static userSyncListener(msg) {
-    return UserSyncBL.syncUser({screen_name: msg.screen_name})
+    return UserSyncBL.syncUser({screen_name: msg.screen_name});
   }
 
   static _userSync() {
@@ -27,12 +27,12 @@ class UserSyncSubscriber {
       }
     };
     AmqpSugar.subscribeMessage(opts, UserSyncSubscriber.userSyncListener)
-      .then((o) => {
+      .then(o => {
         logger.verbose('OK, do something after twitter.update_user__listen', o);
       })
       .catch(err => {
         logger.error('Error in subscribeMessage', err);
-      })
+      });
   }
 }
 

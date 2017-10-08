@@ -19,7 +19,7 @@ describe('Integration => user-history-followers.bl', () => {
   before(() => {
     return testLib.init('db-only').then(result => {
       appServer = result.appServer;
-    })
+    });
   });
 
   after(() => {
@@ -28,7 +28,6 @@ describe('Integration => user-history-followers.bl', () => {
     }
     return Promise.resolve();
   });
-
 
   beforeEach(() => {
     return UserHistoryFollowersBL.removeAll();
