@@ -2,5 +2,8 @@
   "extends": "eslint-config-space-single/esnext",
   "rules": {
     "no-warning-comments": "off"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017
   }
 }

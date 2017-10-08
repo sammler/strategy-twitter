@@ -1,13 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const amqpSugar = require('./lib/amqplib-sugar');
 const logger = require('winster').instance();
 const MongooseConnection = require('mongoose-connection-promise');
 const _ = require('lodash');
 const routesConfig = require('./config/routes-config');
-
-// Todo: has to be (re)moved ...
-const RABBITMQ_URI = process.env.SAMMLER_RABBITMQ_URI || 'amqp://guest:guest@localhost:5672';
+const subscriberConfig = require('./config/subscriber-config');
 
 const defaultConfig = require('./config/config');
 
@@ -37,16 +34,7 @@ class AppServer {
    */
   _initSubscribers() {
 
-    const opts = {
-      server: this.config.RABBITMQ_URI,
-      exchange: {
-        type: 'topic',
-        name: 'system'
-      },
-      key: 'heartbeat'
-    };
-
-    amqpSugar.subscribeMessage(opts);
+    subscriberConfig.init();
   }
 
   /**
@@ -55,10 +43,13 @@ class AppServer {
    */
   _initDB() {
     return this.mongooseConnection.connect()
-      .then(connection => this.app.db = connection)
+      .then(connection => {
+        this.app.db = connection;
+        return this.app.db;
+      })
       .catch(err => {
         this.logger.fatal('An error occurred connecting to MongoDB', err);
-      })
+      });
   }
 
   start() {

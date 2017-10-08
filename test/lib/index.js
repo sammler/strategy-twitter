@@ -2,19 +2,6 @@ const AppServer = require('./../../src/app-server');
 const testConfig = require('./../test-config');
 const superTest = require('supertest');
 
-const init = (testMode) => {
-
-  let mode = testMode || testConfig.TEST_MODE;
-
-  if (mode === 'server') {
-    return _initServer();
-  } else if (mode === 'rest') {
-    return _initRest();
-  } else if (mode === 'db-only') {
-    return _initDBOnly();
-  }
-
-};
 
 const _initServer = () => {
   const appServer = new AppServer(testConfig);
@@ -49,6 +36,18 @@ const _initDBOnly = () => {
     });
 };
 
+const init = (testMode) => {
+
+  let mode = testMode || testConfig.TEST_MODE;
+
+  if (mode === 'server') {
+    return _initServer();
+  } else if (mode === 'rest') {
+    return _initRest();
+  } else if (mode === 'db-only') {
+    return _initDBOnly();
+  }
+};
 module.exports = {
   init
 };

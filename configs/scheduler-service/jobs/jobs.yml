@@ -1,0 +1,14 @@
+jobs:
+  - name: twitter.update_user
+    enabled: true
+    strategy: interval
+    exchange:
+      type: topic
+      name: twitter
+    key: twitter.update_user
+    payload:
+      screen_name: waltherstefan
+      s5r_user_id: 1
+    interval: 20000
+    options:
+      correlationId: "{{correlation_id}}"

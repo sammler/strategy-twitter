@@ -46,7 +46,16 @@ class UsersBL {
     return UsersModel
       .findOneAndUpdate({twitter_id: data.twitter_id}, data, {new: true, upsert: true, setDefaultsOnInsert: true})
       .exec();
+  }
 
+  /**
+   * Get the user
+   * @param {object} query - Query definition to be passed to mongoose' `findOne`.
+   * @returns {Query|*}
+   */
+  static get(query) {
+    return UsersModel
+      .findOne(query);
   }
 
   /**
@@ -61,10 +70,6 @@ class UsersBL {
       screen_name: twitUser.screen_name,
       profile: twitUser
     };
-  }
-
-  static getUnfollowers() {
-
   }
 
   /**

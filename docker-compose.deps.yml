@@ -24,9 +24,10 @@ services:
     image: sammlerio/scheduler-service
     container_name: scheduler-service
     environment:
-      - SAMMLER_RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
-#      - SAMMLER_JOBS_SERVICE_URI=http://jobs-service:3003
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
+      - LOAD_JOBS_FROM_FILE=true
     command: ["npm", "run", "start:watch"]
     volumes:
       - ./node_modules/scheduler-service:/opt/scheduler-service
+      - ./configs/scheduler-service/jobs:/opt/scheduler-service/src/config/jobs
 

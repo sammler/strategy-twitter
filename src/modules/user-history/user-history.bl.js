@@ -1,5 +1,6 @@
 
 const UserHistoryModel = require('./user-history.model').Model;
+const Lib = require('./../../lib/');
 
 class UserHistoryBL {
 
@@ -27,14 +28,32 @@ class UserHistoryBL {
     };
 
     return UserHistoryModel
-      .findOneAndUpdate({twitter_id: item.twitter_id, date: item.date}, item, opts)
+      .findOneAndUpdate({twitter_id: item.twitter_id, date_utc: item.date_utc}, item, opts)
       .exec();
   }
 
+  /**
+   * Returns the total amount of records in the UserHistory table
+   */
   static count() {
     return UserHistoryModel
       .count()
       .exec();
+  }
+
+  /**
+   * Converts the Twitter user model to a user-history record.
+   * @param twitModel
+   */
+  static twitUserModelToUserHistory(twitModel) {
+    let r = {};
+    r.twitter_id = twitModel.twitter_id;
+    r.friends_count = twitModel.profile.friends_count;
+    r.statuses_count = twitModel.profile.statuses_count;
+    r.listed_count = twitModel.profile.listed_count;
+    r.followers_count = twitModel.profile.followers_count;
+    r.date_utc = Lib.startOfDayUtc();
+    return r;
   }
 
   /**

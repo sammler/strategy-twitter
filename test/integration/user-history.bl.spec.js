@@ -9,7 +9,7 @@ describe('Integration => user-history.bl', () => {
 
   const mockUser = {
     twitter_id: 1,
-    date: Lib.startOfDayUtc(),
+    date_utc: Lib.startOfDayUtc(),
     friends_count: 2,
     statuses_count: 3,
     listed_count: 4,
@@ -99,7 +99,7 @@ describe('Integration => user-history.bl', () => {
             expect(result).to.be.equal(1);
 
             let mockUser2 = _.clone(mockUser);
-            mockUser2.date = mockUser2.date.add(1, 'd');
+            mockUser2.date_utc = mockUser2.date_utc.add(1, 'd');
 
             return UserHistoryBL.upsert(mockUser2)
               .then(updatedResult => {

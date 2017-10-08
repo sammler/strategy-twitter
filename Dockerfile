@@ -44,7 +44,7 @@ COPY .eslintrc.json .
 COPY /src ./src/
 COPY /test ./test/
 
-RUN  npm run lint && npm run test:unit
+RUN  npm run lint:fix && npm run lint && npm run test:unit
 
 # --------------------------------------
 #                 RELEASE
