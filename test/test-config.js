@@ -5,7 +5,7 @@ module.exports = {
     debug: false,
     host: process.env.MONGODB_HOST || 'localhost',
     port: process.env.MONGODB_PORT | 27017,
-    database: 'SAMMLER_STRATEGY_GITHUB--TEST',
+    database: 'SAMMLER_STRATEGY_TWITTER--TEST',
     connectOptions: {
       db: {},
       server: {

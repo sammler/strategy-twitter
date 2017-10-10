@@ -11,6 +11,7 @@ class UserSyncSubscriber {
   }
 
   static userSyncListener(msg) {
+    // Todo: a message needs to be published after success/failure
     return UserSyncBL.syncUser({screen_name: msg.screen_name});
   }
 
@@ -21,18 +22,20 @@ class UserSyncSubscriber {
         type: 'topic',
         name: 'twitter'
       },
-      key: 'twitter.update_user',
+      key: 'twitter.cmd.sync.user',
       queue: {
-        name: 'twitter.update_user__listen'
+        name: 'twitter-sync-user-queue'
       }
     };
-    AmqpSugar.subscribeMessage(opts, UserSyncSubscriber.userSyncListener)
-      .then(o => {
-        logger.verbose('OK, do something after twitter.update_user__listen', o);
-      })
-      .catch(err => {
-        logger.error('Error in subscribeMessage', err);
-      });
+    AmqpSugar.subscribeMessage(opts, UserSyncSubscriber.userSyncListener);
+
+      // Todo this code only happens after subscribing first, so not returning anything for each event!
+      // .then(o => {
+      //   logger.verbose(`OK, do something after ${opts.queue.name}`, o);
+      // })
+      // .catch(err => {
+      //   logger.error('Error in subscribeMessage', err);
+      // });
   }
 }
 

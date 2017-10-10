@@ -37,11 +37,20 @@ class UsersBL {
   /**
    * Upserts the twitUser in the database.
    *
-   * @param twitUser
+   * @param {Object} user - The user object.
+   * @param {Boolean} convertToModel - whether to convert the user (from a Twitter result) to a mongoose model.
+   * @return {Promise}
    */
-  static upsert(twitUser) {
+  static upsert(user, convertToModel) {
 
-    let data = UsersBL.twitToModel(twitUser);
+    let data = null;
+
+    // Todo: Don't really like that, not really self-explanatory
+    if (convertToModel) {
+     data = UsersBL.twitToModel(user);
+    } else {
+      data = user;
+    }
 
     return UsersModel
       .findOneAndUpdate({twitter_id: data.twitter_id}, data, {new: true, upsert: true, setDefaultsOnInsert: true})
@@ -61,10 +70,18 @@ class UsersBL {
   /**
    * Converts the Twitter result to the mongoose model we use.
    *
+   * @description Make sure to pass in twitterResult.data, not the entire object.
+   *
    * @param twitUser
    * @returns {{twitter_id: Number, screen_name: (*|string|screen_name|{type, required}), profile: *}}
    */
   static twitToModel(twitUser) {
+
+    // check if the raw Twitter result has been passed, then throw an error
+    if (twitUser.data) {
+      throw new Error('Do not pass in the raw Twitter result, but rather twitterResult.data');
+    }
+
     return {
       twitter_id: parseInt(twitUser.id_str, 10),
       screen_name: twitUser.screen_name,

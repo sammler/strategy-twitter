@@ -7,7 +7,10 @@ module.exports = {
   },
   RABBITMQ_URI: process.env.RABBITMQ_URI || 'amqp://guest:guest@localhost:5672',
   intervals: {
+    // Sync interval in minutes
     SYNC_USER_INTERVAL: process.env.SYNC_USER_INTERVAL || 24,
+
+    // Sync interval in minutes
     SYNC_USER_HISTORY_INTERVAL: process.env.SYNC_USER_HISTORY_INTERVAL || 24
   }
 };

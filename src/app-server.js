@@ -5,6 +5,7 @@ const MongooseConnection = require('mongoose-connection-promise');
 const _ = require('lodash');
 const routesConfig = require('./config/routes-config');
 const subscriberConfig = require('./config/subscriber-config');
+const AmqpSugar = require('./lib/amqplib-sugar');
 
 const defaultConfig = require('./config/config');
 
@@ -23,6 +24,9 @@ class AppServer {
     this.app.use(bodyParser.json());
 
     routesConfig.init(this.app);
+
+    // Todo(AAA): A hack to test ...
+    this._initRabbitMQ();
   }
 
   /**
@@ -33,8 +37,11 @@ class AppServer {
    * @private
    */
   _initSubscribers() {
-
     subscriberConfig.init();
+  }
+
+  async _initRabbitMQ() {
+    return await AmqpSugar._connect(this.config.RABBITMQ_URI);
   }
 
   /**

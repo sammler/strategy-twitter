@@ -75,20 +75,13 @@ class UserSyncBl {
         type: 'topic',
         name: 'twitter'
       },
-      key: 'twitter.update_user_history',
+      key: 'twitter.cmd.sync.user-history',
       payload: {
-        screen_name: opts.screen_name,
-        s5r_user_id: opts.s5r_user_id
-      },
-      // Todo: Needs to be fixed in amqplib-sugar, not her e...
-      retry_behavior: {
-        attempts: 100
+        screen_name: opts.screen_name
       }
     };
 
-    // Todo(AA): We should have some dbLogging here ...
-    logger.verbose('optsSyncHistory', optsSyncHistory);
-
+    // Todo: Should be moved to the listener
     return await AmqpSugar.publishMessage(optsSyncHistory);
   }
 

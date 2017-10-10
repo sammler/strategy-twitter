@@ -12,7 +12,7 @@ services:
       - 27017
 
   rabbitmq:
-    image: rabbitmq:3.6.6-management
+    image: sammlerio/rabbitmq
     container_name: rabbitmq
     ports:
       - "8080:15672"

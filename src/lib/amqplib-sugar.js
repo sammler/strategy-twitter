@@ -9,6 +9,8 @@ function encode(doc) {
   return new Buffer(JSON.stringify(doc));
 }
 
+var connection = null;
+
 /**
  * Sugar methods to work with amqplib.
  */
@@ -54,16 +56,18 @@ class AmqpSugarLib {
     return AmqpSugarLib._connect(opts)
       .then(conn => {
         conn.createChannel()
-          .then(ch => {
-            ch.assertExchange(opts.exchange.name, opts.exchange.type, {durable: true});
-            ch.publish(opts.exchange.name, opts.key, encode(opts.payload), opts.options);
+          .then(channel => {
+            channel.assertExchange(opts.exchange.name, opts.exchange.type, {durable: true});
+            channel.publish(opts.exchange.name, opts.key, encode(opts.payload), opts.options);
             logger.verbose(`[AMQP] Sent ${opts.key}: ${JSON.stringify(opts.payload, null)}`);
 
+            setTimeout(() => { channel.close()}, 500);
+
             // Todo: Not clear, why we need a setTimeout here ...
-            setTimeout(() => {
-              conn.close();
-              // logger.verbose('[AmqplibSugar:publishMessage]: Connection closed');
-            }, 500);
+            // setTimeout(() => {
+            //   conn.close();
+            //   logger.verbose('[AMQP]: Connection closed (publishMessage)');
+            // }, 500);
           });
       });
   }
@@ -91,18 +95,19 @@ class AmqpSugarLib {
     return AmqpSugarLib._connect(opts)
       .then(conn => {
 
-        logger.verbose('subscribeMessage => we have a channel');
+        logger.verbose(`[AMQP] Subscribed to queue: ${opts.queue.name}`);
 
         conn.on('error', err => {
-          console.error('OK, we got an error with the connection in subscribeMessage', err);
+          console.error('[AMQP] OK, we got an error with the connection in subscribeMessage', err);
           return promiseRetry((/* retry, number */) => {
             // Todo: These logs are not shown ?
-            logger.verbose('Trying to re-subscribe to the message');
-            console.log('Trying to re-subscribe to the message');
+            logger.verbose('[AMQP] Trying to re-subscribe to the message');
+            console.log('[AMQP] Trying to re-subscribe to the message');
             return AmqpSugarLib.subscribeMessage(opts);
           });
         });
 
+        // Todo(AAA): Verify, seems that we keep creating channels?
         return conn.createChannel();
       })
       .then(channel => {
@@ -119,19 +124,18 @@ class AmqpSugarLib {
               fn(msgContent)
                 .then(() => {
                   logger.trace(`[AMQP] ack => ${opts.queue.name}`);
-                  channel.ack(msg);
+                  channel.ack(msg); // Closing the channel is handled by ack()
                 })
                 .catch(err => {
                   logger.trace(`[AMQP] nack => ${opts.queue.name}`, err);
-                  channel.nack(msg);
+                  channel.nack(msg); // Closing the channel is handled by nack()
                 });
             }
-
           }, {noAck: false})
         ]);
       })
       .catch(err => {
-        logger.error('Cannot connect to RabbitMQ', err);
+        logger.error('[AMQP] Cannot connect to RabbitMQ', err);
       });
   }
 
@@ -162,17 +166,27 @@ class AmqpSugarLib {
     //   throw new Error()
     // }
 
-    return promiseRetry((retry, number) => {
+    // Todo(AAA): Still every subscriber opens a new connection, this needs to be fixed to use one common connection.
+    if (!connection) {
+      logger.verbose('Opening a new connection');
+      return promiseRetry((retry, number) => {
 
-      opts.retry_behavior.attempts = number;
-      if (number >= 2) {
-        logger.verbose(`Trying to (re)connect to RabbitMq, attempt number ${number - 1}`);
-      }
+        opts.retry_behavior.attempts = number;
+        if (number >= 2) {
+          logger.verbose(`[AMQP] Trying to (re)connect to RabbitMq, attempt number ${number - 1}`);
+        }
 
-      return amqp.connect(opts.server)
-        .catch(retry);
+        return amqp.connect(opts.server)
+          .then(conn => {
+            connection = conn;
+            return Promise.resolve(conn);
+          })
+          .catch(retry);
 
-    });
+      });
+    } else {
+      return Promise.resolve(connection);
+    }
   }
 
   static _validateConnectOptions(opts) {

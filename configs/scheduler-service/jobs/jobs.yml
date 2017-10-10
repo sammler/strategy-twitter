@@ -1,11 +1,11 @@
 jobs:
-  - name: twitter.update_user
+  - name: job-twitter.cmd.sync-user
     enabled: true
     strategy: interval
     exchange:
       type: topic
       name: twitter
-    key: twitter.update_user
+    key: twitter.cmd.sync.user
     payload:
       screen_name: waltherstefan
       s5r_user_id: 1

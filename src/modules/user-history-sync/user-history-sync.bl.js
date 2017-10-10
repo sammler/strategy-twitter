@@ -1,5 +1,8 @@
 const config = require('./../../config/config');
 const moment = require('moment');
+const logger = require('winster').instance();
+const Lib = require('./../../lib/');
+const _ = require('lodash');
 
 const UsersBL = require('./../users/users.bl');
 const UserHistoryBL = require('./../user-history/user-history.bl');
@@ -47,22 +50,27 @@ class UserHistorySyncBl {
    */
   static async syncUserHistory(opts) {
 
+    logger.verbose('[syncHistoryUser] Sync interval', UserHistorySyncBl.SYNC_USER_HISTORY_INTERVAL);
     // Todo: Add to the filter to only get items older than SYNC_USER_HISTORY_INTERVAL
     let user = await UsersBL.get({screen_name: opts.screen_name});
+    logger.verbose('[syncHistoryUser] Rec:howOld: ', UserHistorySyncBl.howOld(user, 'last_sync_ts', 'hours'));
+    if (user === null || UserHistorySyncBl.howOld(user, 'last_sync_ts', 'hours') > UserHistorySyncBl.SYNC_USER_HISTORY_INTERVAL) {
+      logger.verbose('[syncHistoryUser] Rec is older or no user', user ? user.last_sync_ts : '<no-user>');
+      let twitUser = await UsersBL.getTwitUser({screen_name: opts.screen_name});
+      user = UsersBL.twitToModel(twitUser.data);
 
-    console.log('Rec:howOld: ', UserHistorySyncBl.howOld(user, 'last_sync_ts', 'hours'));
-    if (user && UserHistorySyncBl.howOld(user, 'last_sync_ts', 'hours') > UserHistorySyncBl.SYNC_USER_HISTORY_INTERVAL) {
-      console.log('Rec is older', user.last_sync_ts);
-      // Todo: OK, get rec from twitter
-      user = UsersBL.getTwitUser({screen_name: opts.screen_name});
+      // Update the user, too, otherwise we'll always fetch the newest user
+      logger.verbose('[syncHistoryUser] Updating user');
+      user.last_sync_ts = Lib.nowUtc();
+      await UsersBL.upsert(user, false);
+
     } else {
-      console.log('Rec is fine', user.last_sync_ts);
-      // Todo: OK, use this rec to save the history
+      // OK, use this rec to save the history, so basically skip and proceed.
+      logger.verbose('[syncHistoryUser] Rec is fine', user.last_sync_ts);
     }
     let userHistoryModel = UserHistoryBL.twitUserModelToUserHistory(user);
     return UserHistoryBL.upsert(userHistoryModel);
   }
-
 }
 
 module.exports = UserHistorySyncBl;
