@@ -1,0 +1,29 @@
+- exchange:
+    type: topic
+    name: twitter
+  key: twitter.cmd.sync.user
+  payload:
+  - screen_name
+  - s5r_user_id
+  queue:
+    name: twitter-sync-user_queue
+
+- exchange:
+    type: topic
+    name: twitter
+  key: twitter.cmd.sync.user-history
+  payload:
+  - screen_name
+  queue:
+    name: twitter-sync-user-history_queue
+
+- exchange:
+    type: topic
+    name: twitter
+  key: twitter.cmd.sync.user-history-followers
+  payload:
+  - screen_name
+  - next_cursor
+  - count
+  queue:
+    name: twitter-sync-user-history-followers_queue

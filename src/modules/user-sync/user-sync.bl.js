@@ -47,42 +47,39 @@ class UserSyncBl {
   static async syncUser(opts) {
 
     const logPrefix = `[syncUser:${opts.screen_name}]`;
-    logger.verbose('syncUser.args: ', opts);
+    let status = null;
+    // logger.verbose('syncUser.args: ', opts);
 
     let user = await UsersBl.get({screen_name: opts.screen_name});
 
     // Only fetch an update of the user if the user's record is older than SYNC_USER_INTERVAL
-    if (!user || UserSyncBl.howOld(user, 'last_sync_ts', 'hours') >= UserSyncBl.SYNC_USER_INTERVAL) {
-      logger.verbose(`${logPrefix} OK, we have to fetch the user`);
+    if (!user ) {
+
+      // logger.verbose(`${logPrefix} OK, we don't have a user, we have to create one ...`);
       let twitUser = await UsersBl.getTwitUser({screen_name: opts.screen_name});
-      // logger.verbose(`${logPrefix} twitUser`, twitUser);
       // Todo(AA): Here we have to handle the case that the rate-limit is exceeded ...
       user = await UsersBl.upsert(twitUser.data);
-      // logger.verbose(`${logPrefix} user`, user);
+
+      status = 'created';
+    }
+    else if (UserSyncBl.howOld(user, 'last_sync_ts', 'hours') >= UserSyncBl.SYNC_USER_INTERVAL) {
+
+
+      let twitUser = await UsersBl.getTwitUser({screen_name: opts.screen_name});
+      // Todo(AA): Here we have to handle the case that the rate-limit is exceeded ...
+      user = await UsersBl.upsert(twitUser.data);
+
+      status = 'updated';
+
     } else {
-      logger.verbose(`${logPrefix} We already have a user`);
+      // logger.verbose(`${logPrefix} We already have a user`);
+      status = 'no-action';
     }
 
-    // OK, we have a user now, great, let's proceed
-    logger.verbose(`${logPrefix} We have a user now:`, {screen_name: user.screen_name, _id: user._id.toString()});
-
-    logger.verbose(`${logPrefix} Let's publish a new event to RabbitMQ`);
-
-    // eslint-disable-next-line no-unused-vars
-    let optsSyncHistory = {
-      server: config.RABBITMQ_URI,
-      exchange: {
-        type: 'topic',
-        name: 'twitter'
-      },
-      key: 'twitter.cmd.sync.user-history',
-      payload: {
-        screen_name: opts.screen_name
-      }
-    };
-
-    // Todo: Should be moved to the listener
-    return await AmqpSugar.publishMessage(optsSyncHistory);
+    return {
+      user,
+      status
+    }
   }
 
 }

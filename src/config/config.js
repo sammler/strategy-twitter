@@ -5,6 +5,15 @@ module.exports = {
     port: process.env.MONGODB_PORT || 27017,
     database: process.env.MONGODB_DATABASE || 'SAMMLER_STRATEGY_TWITTER--DEV'
   },
+  RABBITMQ_CONNECTION: {
+    server: process.env.RABBITMQ_URI || 'amqp://guest:guest@localhost:5672',
+    retry_behavior: {
+      enabled: true,
+      attempts: 0,
+      retries: 10,
+      interval: 10000
+    }
+  },
   RABBITMQ_URI: process.env.RABBITMQ_URI || 'amqp://guest:guest@localhost:5672',
   intervals: {
     // Sync interval in minutes
