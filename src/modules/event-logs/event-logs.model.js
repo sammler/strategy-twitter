@@ -15,10 +15,10 @@ const schema = new Schema({
     type: Schema.Types.String
   },
   action: {
-    type: Schema.Types.String,
+    type: Schema.Types.String
   },
   status: {
-    type: Schema.Types.String,
+    type: Schema.Types.String
   },
   result: {
     type: Schema.Types.Object

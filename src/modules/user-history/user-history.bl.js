@@ -1,7 +1,6 @@
-
 const UserHistoryModel = require('./user-history.model').Model;
 const Lib = require('./../../lib/');
-const logger = require('winster').instance();
+// const logger = require('winster').instance();
 
 class UserHistoryBL {
 

@@ -13,7 +13,7 @@ class UserHistoryFollowersSubscriber {
   }
 
   static listener(msg) {
-    //return UserHistorySyncBL.syncUserHistory(msg);
+    // return UserHistorySyncBL.syncUserHistory(msg);
   }
 
   static subscriber() {

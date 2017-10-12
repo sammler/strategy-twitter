@@ -9,8 +9,9 @@ class EventLogsBL {
    */
   static add(logEntry) {
 
+    logger.verbose('[even-log] Adding a new entry');
     return EventLogsModel
-      .create(logEntry)
+      .create(logEntry);
   }
 }
 

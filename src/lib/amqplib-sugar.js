@@ -70,7 +70,7 @@ class AmqpSugarLib {
               logger.trace(`[AMQP][publish] ${opts.key}: ${JSON.stringify(opts.payload, null)}, correlationId: ${opts.options.correlationId}`);
             }
             setTimeout(() => {
-              channel.close()
+              channel.close();
             }, 500);
 
           });
@@ -195,9 +195,9 @@ class AmqpSugarLib {
           .catch(retry);
 
       });
-    } else {
-      return Promise.resolve(connection);
-    }
+    } 
+    return Promise.resolve(connection);
+    
   }
 
   static _validateConnectOptions(opts) {

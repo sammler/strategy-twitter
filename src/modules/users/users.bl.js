@@ -47,7 +47,7 @@ class UsersBL {
 
     // Todo: Don't really like that, not really self-explanatory
     if (convertToModel) {
-     data = UsersBL.twitToModel(user);
+      data = UsersBL.twitToModel(user);
     } else {
       data = user;
     }

@@ -14,17 +14,14 @@ class UserSyncSubscriber {
 
   static listener(msgContent, msgRaw) {
 
-
     // Todo: a message needs to be published after success/failure
     // Todo: we are probably missing the correlation_id here
     return UserSyncBL.syncUser({screen_name: msgContent.screen_name})
       .then(async result => {
 
-
         const logPrefix = `[syncUser:${msgContent.screen_name}]`;
         logger.trace(`${logPrefix} status after syncUser => `, result.status);
         // logger.verbose(`${logPrefix} We have a user now:`, {screen_name: result.user.screen_name, _id: result.user._id.toString()});
-
 
         // Now let's publish
         // - twitter.user.synced (should contain what we have done)
@@ -41,7 +38,7 @@ class UserSyncSubscriber {
 
         // await UserSyncSubscriber._publishNextSteps(user);
 
-      })
+      });
   }
 
   static async _publishEvents(msg) {
