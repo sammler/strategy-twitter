@@ -1,11 +1,7 @@
-const _ = require('lodash');
-const findPkg = require('find-pkg');
-const pkg = require(findPkg.sync('.'));
 const testLib = require('./../lib');
-
 const UsersBL = require('./../../src/modules/users/users.bl');
 
-describe('Integration => users.bl', () => {
+describe.only('Integration => users.bl', () => {
 
   let appServer;
   before(() => {
@@ -69,5 +65,4 @@ describe('Integration => users.bl', () => {
           });
       });
   });
-
 });

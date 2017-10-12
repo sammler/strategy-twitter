@@ -12,6 +12,7 @@ class UserSyncBl {
     return config.intervals.SYNC_USER_INTERVAL;
   }
 
+  // Todo: Should be move to somewhere else, that's re-usable for many other areas.
   /**
    * Returns how old a record is (expressed in hours).
    *
@@ -68,6 +69,8 @@ class UserSyncBl {
       let twitUser = await UsersBl.getTwitUser({screen_name: opts.screen_name});
       // Todo(AA): Here we have to handle the case that the rate-limit is exceeded ...
       user = await UsersBl.upsert(twitUser.data);
+
+      logger.verbose('updated user', user);
 
       status = 'updated';
 

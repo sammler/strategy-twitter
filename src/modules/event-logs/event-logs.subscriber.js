@@ -28,6 +28,7 @@ class EventLogsSubscriber {
         type: 'topic',
         name: 'twitter'
       },
+      // Todo: sync-sync??
       key: 'twitter.sync.user-sync.event-log',
       queue: {
         name: 'event-log_queue'

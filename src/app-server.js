@@ -26,7 +26,7 @@ class AppServer {
     routesConfig.init(this.app);
 
     // Todo(AAA): A hack to test ...
-    this._initRabbitMQ();
+    // this._initRabbitMQ();
   }
 
   /**
