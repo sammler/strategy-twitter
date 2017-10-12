@@ -47,9 +47,7 @@ class UserSyncBl {
   // eslint-disable-next-line
   static async syncUser(opts) {
 
-    const logPrefix = `[syncUser:${opts.screen_name}]`;
     let status = null;
-
     let user = await UsersBl.get({screen_name: opts.screen_name});
 
     // Only fetch an update of the user if the user's record is older than SYNC_USER_INTERVAL
