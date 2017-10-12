@@ -2,8 +2,8 @@ const jsYml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
 
-process.env.NODE_ENV = 'test';
-process.env.WINSTER_SUPRESS_LOGGING = 'true';
+// process.env.NODE_ENV = 'test';
+// process.env.WINSTER_SUPRESS_LOGGING = '';
 
 // if (process.env.CIRCLECI !== 'true') {
 //

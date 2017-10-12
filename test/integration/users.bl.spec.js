@@ -1,7 +1,7 @@
 const testLib = require('./../lib');
 const UsersBL = require('./../../src/modules/users/users.bl');
 
-describe.only('Integration => users.bl', () => {
+describe('INTEGRATION => users.bl', () => {
 
   let appServer;
   before(() => {

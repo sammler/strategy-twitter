@@ -42,14 +42,13 @@ class UserSyncBl {
    * @param {object} opts - Arguments to pass to syncUser.
    * @param {string} opts.screen_name - The Twitter screen name of the user.
    *
-   * @returns {*}
+   * @returns {Object} result - The result of the sync process.
    */
   // eslint-disable-next-line
   static async syncUser(opts) {
 
     const logPrefix = `[syncUser:${opts.screen_name}]`;
     let status = null;
-    // logger.verbose('syncUser.args: ', opts);
 
     let user = await UsersBl.get({screen_name: opts.screen_name});
 
@@ -59,16 +58,16 @@ class UserSyncBl {
       // logger.verbose(`${logPrefix} OK, we don't have a user, we have to create one ...`);
       let twitUser = await UsersBl.getTwitUser({screen_name: opts.screen_name});
       // Todo(AA): Here we have to handle the case that the rate-limit is exceeded ...
-      user = await UsersBl.upsert(twitUser.data);
+      let userObj = UsersBl.twitToModel(twitUser.data);
+      user = await UsersBl.upsert(userObj);
 
       status = 'created';
-    } else if (UserSyncBl.howOld(user, 'last_sync_ts', 'hours') >= UserSyncBl.SYNC_USER_INTERVAL) {
+    } else if (UserSyncBl.howOld(user, 'last_sync_utc_ts', 'hours') >= UserSyncBl.SYNC_USER_INTERVAL) {
 
       let twitUser = await UsersBl.getTwitUser({screen_name: opts.screen_name});
       // Todo(AA): Here we have to handle the case that the rate-limit is exceeded ...
-      user = await UsersBl.upsert(twitUser.data);
-
-      logger.verbose('updated user', user);
+      let userObj = UsersBl.twitToModel(twitUser.data);
+      user = await UsersBl.upsert(userObj);
 
       status = 'updated';
 

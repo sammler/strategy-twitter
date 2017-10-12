@@ -41,19 +41,10 @@ class UsersBL {
    * @param {Boolean} convertToModel - whether to convert the user (from a Twitter result) to a mongoose model.
    * @return {Promise}
    */
-  static upsert(user, convertToModel) {
+  static upsert(user) {
 
-    let data = null;
-
-    // Todo: Don't really like that, not really self-explanatory
-    if (convertToModel) {
-      data = UsersBL.twitToModel(user);
-    } else {
-      data = user;
-    }
-
-    return UsersModel
-      .findOneAndUpdate({twitter_id: data.twitter_id}, data, {new: true, upsert: true, setDefaultsOnInsert: true})
+   return UsersModel
+      .findOneAndUpdate({twitter_id: user.twitter_id}, user, {new: true, upsert: true, setDefaultsOnInsert: true})
       .exec();
   }
 
@@ -87,6 +78,15 @@ class UsersBL {
       screen_name: twitUser.screen_name,
       profile: twitUser
     };
+  }
+
+  /**
+   * Returns the total amount of records in the Users table
+   */
+  static count() {
+    return UsersModel
+      .count()
+      .exec();
   }
 
   /**
