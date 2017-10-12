@@ -55,20 +55,12 @@ class UserSyncBl {
     // Only fetch an update of the user if the user's record is older than SYNC_USER_INTERVAL
     if (!user) {
 
-      // logger.verbose(`${logPrefix} OK, we don't have a user, we have to create one ...`);
-      let twitUser = await UsersBl.getTwitUser({screen_name: opts.screen_name});
-      // Todo(AA): Here we have to handle the case that the rate-limit is exceeded ...
-      let userObj = UsersBl.twitToModel(twitUser.data);
-      user = await UsersBl.upsert(userObj);
-
+      user = await UserSyncBl._updateUser(opts.screen_name);
       status = 'created';
+
     } else if (UserSyncBl.howOld(user, 'last_sync_utc_ts', 'hours') >= UserSyncBl.SYNC_USER_INTERVAL) {
 
-      let twitUser = await UsersBl.getTwitUser({screen_name: opts.screen_name});
-      // Todo(AA): Here we have to handle the case that the rate-limit is exceeded ...
-      let userObj = UsersBl.twitToModel(twitUser.data);
-      user = await UsersBl.upsert(userObj);
-
+      user = await UserSyncBl._updateUser(opts.screen_name);
       status = 'updated';
 
     } else {
@@ -80,6 +72,12 @@ class UserSyncBl {
       user,
       status
     };
+  }
+
+  static async _updateUser(screen_name) {
+    let twitUser = await UsersBl.getTwitUser({screen_name});
+    let userObj = UsersBl.twitToModel(twitUser.data);
+    return await UsersBl.upsert(userObj);
   }
 
 }

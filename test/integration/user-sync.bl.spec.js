@@ -4,7 +4,7 @@ const UserSyncBL = require('./../../src/modules/user-sync/user-sync.bl');
 const lib = require('./../../src/lib/index');
 const moment = require('moment');
 
-describe('INTEGRATION => user-sync.bl', () => {
+describe.only('INTEGRATION => user-sync.bl', () => {
 
   let appServer;
   before(() => {
