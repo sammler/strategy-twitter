@@ -4,7 +4,6 @@ const config = require('./../../config/config');
 const logger = require('winster').instance();
 const msgTopology = require('./../../config/msg-topology');
 const UserSyncBL = require('./../../modules/user-sync/user-sync.bl');
-const uuidv4 = require('uuid/v4');
 
 class UserSyncSubscriber {
 

@@ -3,8 +3,8 @@ const AmqpSugar = require('./../../lib/amqplib-sugar');
 const config = require('./../../config/config');
 const EventLogsBL = require('./event-logs.bl');
 const logger = require('winster').instance();
-const msgTopology = require('./../../config/msg-topology');
-const uuid4 = require('uuid/v4');
+// const msgTopology = require('./../../config/msg-topology');
+// const uuid4 = require('uuid/v4');
 
 class EventLogsSubscriber {
 

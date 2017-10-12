@@ -3,7 +3,7 @@ const AmqpSugar = require('./../../lib/amqplib-sugar');
 const config = require('./../../config/config');
 const logger = require('winster').instance();
 const msgTopology = require('./../../config/msg-topology');
-const UserHistoryFollowersSyncBL = require('./user-history-followers-sync.bl');
+// const UserHistoryFollowersSyncBL = require('./user-history-followers-sync.bl');
 
 class UserHistoryFollowersSubscriber {
 
@@ -12,7 +12,7 @@ class UserHistoryFollowersSubscriber {
     UserHistoryFollowersSubscriber.subscriber();
   }
 
-  static listener(msg) {
+  static listener(/* msg */) {
     // return UserHistorySyncBL.syncUserHistory(msg);
   }
 

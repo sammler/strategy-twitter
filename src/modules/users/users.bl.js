@@ -43,7 +43,7 @@ class UsersBL {
    */
   static upsert(user) {
 
-   return UsersModel
+    return UsersModel
       .findOneAndUpdate({twitter_id: user.twitter_id}, user, {new: true, upsert: true, setDefaultsOnInsert: true})
       .exec();
   }
