@@ -11,33 +11,42 @@ class UserSyncSubscriber {
     UserSyncSubscriber.subscriber();
   }
 
-  static listener(msgContent, msgRaw) {
+  static async listener(msgContent, msgRaw) {
 
-    // Todo: a message needs to be published after success/failure
-    // Todo: we are probably missing the correlation_id here
-    return UserSyncBL.syncUser({screen_name: msgContent.screen_name})
-      .then(async result => {
+    const logPrefix = `[syncUser:${msgContent.screen_name}]`;
 
-        const logPrefix = `[syncUser:${msgContent.screen_name}]`;
-        logger.trace(`${logPrefix} status after syncUser => `, result.status);
-        // logger.verbose(`${logPrefix} We have a user now:`, {screen_name: result.user.screen_name, _id: result.user._id.toString()});
+    try {
+      let result = await UserSyncBL.syncUser({screen_name: msgContent.screen_name});
+      logger.trace(`${logPrefix} status after syncUser => `, result.status);
 
-        // Now let's publish
-        // - twitter.user.synced (should contain what we have done)
-        // - twitter.cmd.sync.user-history
-
-        await UserSyncSubscriber._publishEvents({
-          status: result.status,
-          result: {
-            screen_name: result.user.screen_name,
-            twitter_id: result.user.twitter_id
-          },
-          correlationId: msgRaw.properties.correlationId
-        });
-
-        // await UserSyncSubscriber._publishNextSteps(user);
-
+      await UserSyncSubscriber._publishEvents({
+        status: result.status,
+        result: {
+          screen_name: result.user.screen_name,
+          twitter_id: result.user.twitter_id
+        },
+        correlationId: msgRaw.properties.correlationId
       });
+
+      // Now let's publish
+      // - twitter.user.synced (should contain what we have done)
+      // - twitter.cmd.sync.user-history
+      if (['updated', 'created'].indexOf(result.status)) {
+        // await UserSyncSubscriber._publishNextSteps(user);
+      }
+
+    }
+    catch (e) {
+
+      // Todo: include the error message here
+      await UserSyncSubscriber._publishEvents({
+        status: 'error',
+        result: e,
+        correlationId: msgRaw.properties.correlationId
+      });
+
+    }
+
   }
 
   static async _publishEvents(msg) {
