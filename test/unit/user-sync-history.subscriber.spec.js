@@ -1,4 +1,5 @@
 const UserHistoryBl = require('./../../src/modules/user-history/user-history.bl');
+const UserHistorySyncBl = require('./../../src/modules/user-history-sync/user-history-sync.bl');
 const UserHistorySyncSubscriber = require('./../../src/modules/user-history-sync/user-history-sync.subscriber');
 
 const chai = require('chai');
@@ -25,12 +26,75 @@ describe.only('UNIT => user-sync.subscriber', () => {
     expect(spySubscriber).to.be.calledOnce;
   });
 
-  it('', async () => {
-    expect(false).to.be.true;
+  describe('listener', () => {
+
+    it('should publish to event-log for any result', async () => {
+
+      let spy = sinon.stub(UserHistorySyncBl, 'syncUserHistory').resolves({status: 'foo', user: {screen_name: 'foo', twitter_id: 1}});
+      let spyEvent = sinon.stub(UserHistorySyncSubscriber, '_publishEvents');
+      await UserHistorySyncSubscriber.listener({screen_name: 'waltherstefan'}, {properties: {correlationId: '123'}});
+
+      spy.restore();
+      spyEvent.restore();
+      expect(spyEvent).to.be.calledOnce;
+
+    });
+
+    it('should publish to event-log in case an error is thrown', async () => {
+
+      let spy = sinon.stub(UserHistorySyncBl, 'syncUserHistory').throws();
+      let spyEvent = sinon.stub(UserHistorySyncSubscriber, '_publishEvents');
+      await UserHistorySyncSubscriber.listener({screen_name: 'waltherstefan'}, {properties: {correlationId: '123'}});
+
+      spy.restore();
+      spyEvent.restore();
+      expect(spyEvent).to.be.calledOnce;
+    });
+
+    it.only('in case of result === `fetch`, next steps will be triggered', async () => {
+
+      let spy = sinon.stub(UserHistorySyncBl, 'syncUserHistory').resolves({status: 'fetch', user_history: {screen_name: 'foo'}});
+      let spyEvent = sinon.stub(UserHistorySyncSubscriber, '_publishEvents');
+      let spyNextSteps = sinon.stub(UserHistorySyncSubscriber, '_publishNextSteps');
+      await UserHistorySyncSubscriber.listener({screen_name: 'waltherstefan'}, {properties: {correlationId: '123'}});
+
+      spy.restore();
+      spyEvent.restore();
+      spyNextSteps.restore();
+      expect(spyEvent).to.be.calledOnce;
+      expect(spyNextSteps).to.be.calledOnce;
+
+    });
+
+    it.only('in case of result === `user_existing_rec`, next steps will be triggered', async () => {
+
+      let spy = sinon.stub(UserHistorySyncBl, 'syncUserHistory').resolves({status: 'fetch', user_history: {screen_name: 'foo'}});
+      let spyEvent = sinon.stub(UserHistorySyncSubscriber, '_publishEvents');
+      let spyNextSteps = sinon.stub(UserHistorySyncSubscriber, '_publishNextSteps');
+      await UserHistorySyncSubscriber.listener({screen_name: 'waltherstefan'}, {properties: {correlationId: '123'}});
+
+      spy.restore();
+      spyEvent.restore();
+      spyNextSteps.restore();
+      expect(spyEvent).to.be.calledOnce;
+      expect(spyNextSteps).to.be.calledOnce;
+
+    });
+
   });
 
-  it('', async () => {
-    expect(false).to.be.true;
+  it('in case of `user_existing_rec` or `fetch`, the next steps are triggered', async () => {
+
+    let spy = sinon.stub(UserHistorySyncBl, 'syncUserHistory').resolves({status: 'fetch', user_history: {screen_name: 'foo'}});
+    let spyEvent = sinon.stub(UserHistorySyncSubscriber, '_publishEvents');
+    let spyNextSteps = sinon.stub(UserHistorySyncSubscriber, '_publishNextSteps');
+    await UserHistorySyncSubscriber.listener({screen_name: 'waltherstefan'}, {properties: {correlationId: '123'}});
+
+    spy.restore();
+    spyEvent.restore();
+    spyNextSteps.restore();
+    expect(spyEvent).to.be.calledOnce;
+    expect(spyNextSteps).to.be.calledOnce;
   });
 
 });

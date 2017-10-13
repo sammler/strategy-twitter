@@ -11,13 +11,39 @@ class UserHistorySyncSubscriber {
     UserHistorySyncSubscriber.subscriber();
   }
 
-  static listener(msg) {
+  static async listener(msgContent, msgRaw) {
 
-    // Todo: Here's the place to publish the event messages
-    return UserHistorySyncBL.syncUserHistory(msg)
-      .catch(err => {
-        logger.error.log('syncUserHistory resulted in an error', err);
+    const logPrefix = `[syncUserHistory:${msgContent.screen_name}]`;
+
+    try {
+
+      let result = await UserHistorySyncBL.syncUserHistory(msgContent);
+      // logger.trace(`${logPrefix} full result object => `, result);
+
+      await UserHistorySyncSubscriber._publishEvents({
+        status: result.status,
+        result: {
+          screen_name: result.user_history.screen_name
+        },
+        correlationId: msgRaw.properties.correlationId
       });
+
+      if (['fetch', 'user_existing_rec'].indexOf(result.status) >= 0) {
+        let opts = {
+
+        };
+        await UserHistorySyncSubscriber._publishNextSteps(config.RABBITMQ_CONNECTION, opts);
+      }
+
+    }
+    catch(e) {
+      // logger.error(`${logPrefix} publish an unexpected error`, e);
+      await UserHistorySyncSubscriber._publishEvents({
+        status: 'error',
+        result: e,
+        correlationId: msgRaw.properties.correlationId
+      });
+    }
   }
 
   static subscriber() {
@@ -30,11 +56,31 @@ class UserHistorySyncSubscriber {
       });
   }
 
-  static _publishEvents() {
+  static async _publishEvents(msg) {
+
+    // Todo: load from topology
+    let opts = {
+      exchange: {
+        type: 'topic',
+        name: 'twitter'
+      },
+      key: 'twitter.sync.user-history.event-log',
+      payload: {
+        action: 'twitter.sync.user--history-sync',
+        status: msg.status,
+        result: msg.result
+      },
+      options: {
+        correlationId: msg.correlationId
+      }
+    };
+
+    return await AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, opts);
 
   }
 
-  static _publishNextSteps() {
+  static async _publishNextSteps() {
+
 
   }
 

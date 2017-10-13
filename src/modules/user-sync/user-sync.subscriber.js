@@ -62,7 +62,7 @@ class UserSyncSubscriber {
         type: 'topic',
         name: 'twitter'
       },
-      key: 'twitter.sync.user-sync.event-log',
+      key: 'twitter.sync.user.event-log',
       payload: {
         action: 'twitter.sync.user-sync',
         status: msg.status,

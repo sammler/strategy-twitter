@@ -50,8 +50,6 @@ class UserHistorySyncBl {
    *  a) Save the user to the User table
    *  b) Fetch the history
    *
-   *
-   *
    * @param {Object} opts - Options to pass in
    * @param {String} opts.screen_name - The user's Twitter name.
    * @return {Promise.<UserHistorySyncResult>}
