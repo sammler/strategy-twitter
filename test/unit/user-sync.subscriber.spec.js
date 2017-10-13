@@ -27,9 +27,9 @@ describe('UNIT => user-sync.subscriber', () => {
 
     it('should publish to event-log for any result', async () => {
 
-      let spy = sinon.stub(UserSyncBl, 'syncUser').resolves({status: 'no-action', user: { screen_name: 'foo'}});
+      let spy = sinon.stub(UserSyncBl, 'syncUser').resolves({status: 'no-action', user: {screen_name: 'foo', twitter_id: 1}});
       let spyEvent = sinon.stub(UserSyncSubscriber, '_publishEvents');
-      await UserSyncSubscriber.listener({screen_name: 'waltherstefan'}, {properties: {correlation_id: '123'}});
+      await UserSyncSubscriber.listener({screen_name: 'waltherstefan'}, {properties: {correlationId: '123'}});
 
       spy.restore();
       spyEvent.restore();
@@ -41,21 +41,56 @@ describe('UNIT => user-sync.subscriber', () => {
 
       let spy = sinon.stub(UserSyncBl, 'syncUser').throws();
       let spyEvent = sinon.stub(UserSyncSubscriber, '_publishEvents');
-      await UserSyncSubscriber.listener({screen_name: 'waltherstefan'}, {properties: {correlation_id: '123'}});
+      await UserSyncSubscriber.listener({screen_name: 'waltherstefan'}, {properties: {correlationId: '123'}});
 
       spy.restore();
       spyEvent.restore();
       expect(spyEvent).to.be.calledOnce;
     });
 
-    it('in case of `updated` or `created` the next steps will be published', () => {
+    it('in case of `updated` the next steps will be published', async () => {
+
+      let spy = sinon.stub(UserSyncBl, 'syncUser').resolves({status: 'updated', user: {screen_name: 'foo', twitter_id: 1}});
+      let spyEvents = sinon.stub(UserSyncSubscriber, '_publishEvents').resolves();
+      let spyNextSteps = sinon.stub(UserSyncSubscriber, '_publishNextSteps').resolves(true);
+      await UserSyncSubscriber.listener({screen_name: 'foo'}, {properties: {correlationId: '123'}});
+
+      spy.restore();
+      spyEvents.restore();
+      spyNextSteps.restore();
+      expect(spyEvents).to.be.calledOnce;
+      expect(spyNextSteps).to.be.calledOnce;
 
     });
 
-    it('in case of `no-action` no new event will be published', () => {
+    it('in case of `created` the next steps will be published', async () => {
 
+      let spy = sinon.stub(UserSyncBl, 'syncUser').resolves({status: 'created', user: {screen_name: 'foo', twitter_id: 1}});
+      let spyEvents = sinon.stub(UserSyncSubscriber, '_publishEvents').resolves();
+      let spyNextSteps = sinon.stub(UserSyncSubscriber, '_publishNextSteps').resolves(true);
+      await UserSyncSubscriber.listener({screen_name: 'foo'}, {properties: {correlationId: '123'}});
+
+      spy.restore();
+      spyEvents.restore();
+      spyNextSteps.restore();
+      expect(spyEvents).to.be.calledOnce;
+      expect(spyNextSteps).to.be.calledOnce;
+
+    });
+
+    it('in case of `no-action` no new event will be published', async () => {
+
+      let spy = sinon.stub(UserSyncBl, 'syncUser').resolves({status: 'no-action', user: {screen_name: 'foo', twitter_id: 1}});
+      let spyEvents = sinon.stub(UserSyncSubscriber, '_publishEvents').resolves();
+      let spyNextSteps = sinon.stub(UserSyncSubscriber, '_publishNextSteps').resolves(true);
+      await UserSyncSubscriber.listener({screen_name: 'foo'}, {properties: {correlationId: '123'}});
+
+      spy.restore();
+      spyEvents.restore();
+      spyNextSteps.restore();
+      expect(spyEvents).to.be.calledOnce;
+      expect(spyNextSteps).to.not.be.called;
     })
   });
-
 
 });

@@ -17,7 +17,9 @@ class UserSyncSubscriber {
 
     try {
       let result = await UserSyncBL.syncUser({screen_name: msgContent.screen_name});
-      logger.trace(`${logPrefix} status after syncUser => `, result.status);
+      logger.trace(`${logPrefix} full result object => `, result);
+      // logger.trace(`${logPrefix} status after syncUser => `, result.status);
+      // logger.trace(`${logPrefix} user after syncUser => `, result.user);
 
       await UserSyncSubscriber._publishEvents({
         status: result.status,
@@ -31,14 +33,15 @@ class UserSyncSubscriber {
       // Now let's publish
       // - twitter.user.synced (should contain what we have done)
       // - twitter.cmd.sync.user-history
-      if (['updated', 'created'].indexOf(result.status)) {
-        // await UserSyncSubscriber._publishNextSteps(user);
+      if (['updated', 'created'].indexOf(result.status) >= 0) {
+        logger.trace(`${logPrefix} publish the next steps`);
+        await UserSyncSubscriber._publishNextSteps(result.user);
       }
 
     }
     catch (e) {
 
-      // Todo: include the error message here
+      logger.trace(`${logPrefix} publish an unexpected error`);
       await UserSyncSubscriber._publishEvents({
         status: 'error',
         result: e,
@@ -51,6 +54,7 @@ class UserSyncSubscriber {
 
   static async _publishEvents(msg) {
 
+    // Todo: load from topology
     let opts = {
       exchange: {
         type: 'topic',
@@ -75,20 +79,9 @@ class UserSyncSubscriber {
 
     let pubOpts = _.find(msgTopology, {key: 'twitter.cmd.sync.user-history'});
 
-    // Todo: this has to be dynamic, ... somehow
+    // Todo: this should ideally be dynamic, ... somehow
     // E.g. just take the required parameters from the config and apply them.
     pubOpts.payload.screen_name = msg.screen_name;
-
-    // let optsSyncHistory = {
-    //   exchange: {
-    //     type: 'topic',
-    //     name: 'twitter'
-    //   },
-    //   key: 'twitter.cmd.sync.user-history',
-    //   payload: {
-    //     screen_name: opts.screen_name
-    //   }
-    // };
 
     return await AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, pubOpts);
   }
