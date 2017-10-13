@@ -30,8 +30,10 @@ class UserSyncSubscriber {
         correlationId: msgRaw.properties.correlationId
       });
 
+      // Todo: Needs some refactoring to also publish the events like twitter.user.created, twitter.user.updated, etc.
+      //       (makes sense to first implement the msg-topology library)
       // Now let's publish
-      // - twitter.user.synced (should contain what we have done)
+      // - twitter.user.synced (should contain what we have done) <== NOT IMPLEMENTED, YET
       // - twitter.cmd.sync.user-history
       if (['updated', 'created'].indexOf(result.status) >= 0) {
         logger.trace(`${logPrefix} publish the next steps`);
@@ -72,7 +74,6 @@ class UserSyncSubscriber {
     };
 
     return await AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, opts);
-
   }
 
   static async _publishNextSteps(msg) {

@@ -8,8 +8,7 @@ const UserHistorySyncBL = require('./user-history-sync.bl');
 class UserHistorySyncSubscriber {
 
   static init() {
-    // Todo: A message needs to be published in case of succeeding
-    // UserHistorySyncSubscriber.subscriber();
+    UserHistorySyncSubscriber.subscriber();
   }
 
   static listener(msg) {
@@ -30,6 +29,15 @@ class UserHistorySyncSubscriber {
         logger.error(`Error subscribing to ${subOpts.queue.name}`, err);
       });
   }
+
+  static _publishEvents() {
+
+  }
+
+  static _publishNextSteps() {
+
+  }
+
 }
 
 module.exports = UserHistorySyncSubscriber;

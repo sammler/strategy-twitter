@@ -7,20 +7,22 @@ const sinonChai = require('sinon-chai');
 chai.expect();
 chai.use(sinonChai);
 
-describe('UNIT => user-sync.subscriber', () => {
+describe.only('UNIT => user-sync.subscriber', () => {
 
   it('has some required methods', () => {
     expect(UserSyncSubscriber).to.have.a.property('init').to.be.a('function');
     expect(UserSyncSubscriber).to.have.a.property('listener').to.be.a('function');
     expect(UserSyncSubscriber).to.have.a.property('subscriber').to.be.a('function');
+    expect(UserSyncSubscriber).to.have.a.property('_publishEvents').to.be.a('function');
+    expect(UserSyncSubscriber).to.have.a.property('_publishNextSteps').to.be.a('function');
   });
 
   it('init calls the subscriber', () => {
-    let spy = sinon.stub(UserSyncSubscriber, 'subscriber');
+    let spySubscriber = sinon.stub(UserSyncSubscriber, 'subscriber');
     UserSyncSubscriber.init();
 
-    spy.restore();
-    expect(spy).to.be.calledOnce;
+    spySubscriber.restore();
+    expect(spySubscriber).to.be.calledOnce;
   });
 
   describe('listener', () => {
@@ -90,7 +92,12 @@ describe('UNIT => user-sync.subscriber', () => {
       spyNextSteps.restore();
       expect(spyEvents).to.be.calledOnce;
       expect(spyNextSteps).to.not.be.called;
-    })
+    });
+
+    // Todo: First multiple steps has to be published.
+    xit('multiple next steps were published', async () => {
+
+    });
   });
 
 });
