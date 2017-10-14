@@ -3,18 +3,40 @@ const Twit = require('twit');
 const defaultTwitterConfig = require('./../../config/twitter-config');
 const UsersModel = require('./users.model').Model;
 
-class UsersBL {
+const logger = require('winster').instance();
+
+class UsersBl {
 
   /**
    * Return an array of followers for the given user.
+   * @param {Object} twitOptions
+   * @param {Number} twitOptions.user_id - The user Id to get the followers for.
+   * @param twitConfig
    */
-  static getTwitFollowersIds(twitOptions, twitConfig) {
+  static async getTwitFollowersIds(twitOptions, twitConfig) {
 
     let c = twitConfig || defaultTwitterConfig;
 
-    let twit = new Twit(c);
-    return twit.get('/followers/ids', twitOptions);
+    logger.verbose('twitOptions', twitOptions);
 
+    let twit = new Twit(c);
+    return await twit.get('/followers/ids', twitOptions);
+
+  }
+
+  /**
+   * Fetch the twitter_id either from the database or from twitter
+   * @param screen_name
+   * @returns {Promise.<void>}
+   */
+  static async getTwitterId(screen_name) {
+    let dbUser = await UsersBl.get({screen_name});
+    if (dbUser && dbUser._doc) {
+      return dbUser.twitter_id;
+    } else {
+      let twitUser = await UsersBl.getTwitUser({screen_name});
+      return twitUser.data.id;
+    }
   }
 
   /**
@@ -100,4 +122,4 @@ class UsersBL {
 
 }
 
-module.exports = UsersBL;
+module.exports = UsersBl;

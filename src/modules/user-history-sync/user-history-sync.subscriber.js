@@ -5,6 +5,7 @@ const logger = require('winster').instance();
 const msgTopology = require('./../../config/msg-topology');
 const UserHistorySyncBL = require('./user-history-sync.bl');
 
+// Todo: Add _validateMsg
 class UserHistorySyncSubscriber {
 
   static init() {
@@ -29,6 +30,8 @@ class UserHistorySyncSubscriber {
       });
 
       if (['fetch', 'user_existing_rec'].indexOf(result.status) >= 0) {
+
+        // Todo: load from topology
         let opts = {
           exchange: {
             type: 'topic',
@@ -46,11 +49,12 @@ class UserHistorySyncSubscriber {
       }
 
     }
-    catch(e) {
-      // logger.error(`${logPrefix} publish an unexpected error`, e);
+    catch(err) {
+      // Todo: introduce the notion of _publishError ... makes unit testing easier and more reliable
+      logger.error(`${logPrefix} publish an unexpected error`, err);
       await UserHistorySyncSubscriber._publishEvents({
         status: 'error',
-        result: e,
+        result: err,
         correlationId: msgRaw.properties.correlationId
       });
     }

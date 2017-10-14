@@ -20,10 +20,10 @@
 - exchange:
     type: topic
     name: twitter
-  key: twitter.cmd.sync.user-history-followers
+  key: twitter.cmd.sync.user-followers
   payload:
   - screen_name
   - next_cursor
   - count
   queue:
-    name: twitter-sync-user-history-followers_queue
+    name: twitter-sync-user-followers_queue

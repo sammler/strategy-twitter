@@ -5,6 +5,7 @@ const logger = require('winster').instance();
 const msgTopology = require('./../../config/msg-topology');
 const UserSyncBL = require('./../../modules/user-sync/user-sync.bl');
 
+// Todo: Add _validateMsg
 class UserSyncSubscriber {
 
   static init() {
@@ -42,7 +43,7 @@ class UserSyncSubscriber {
 
     }
     catch (e) {
-
+      // Todo: introduce the notion of _publishError ... makes unit testing easier and more reliable
       logger.trace(`${logPrefix} publish an unexpected error`);
       await UserSyncSubscriber._publishEvents({
         status: 'error',

@@ -11,7 +11,7 @@ const _initServer = () => {
         appServer: appServer
       };
     })
-    .catch(e => {
+    .catch(err => {
       console.error('Error initializing the server: ', err);
     });
 };
@@ -30,7 +30,7 @@ const _initDBOnly = () => {
         appServer: appServer
       };
     })
-    .catch(e => {
+    .catch(err => {
       console.error('Error initializing the DBOnly server: ', err);
     });
 };

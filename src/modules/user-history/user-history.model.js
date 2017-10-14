@@ -25,7 +25,6 @@ const schema = new Schema({
   listed_count: {
     type: Schema.Types.Number,
     required: true
-
   },
   followers_count: {
     type: Schema.Types.Number,

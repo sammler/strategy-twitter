@@ -1,5 +1,5 @@
 const testLib = require('./../lib');
-const UsersBL = require('./../../src/modules/users/users.bl');
+const UsersBl = require('./../../src/modules/users/users.bl');
 
 describe('INTEGRATION => users.bl', () => {
 
@@ -18,14 +18,14 @@ describe('INTEGRATION => users.bl', () => {
   });
 
   beforeEach(() => {
-    return UsersBL.removeAll();
+    return UsersBl.removeAll();
   });
 
   it('bl.upsert => inserts the user if not existing (authorized user)', () => {
     const screen_name = 'waltherstefan';
-    return UsersBL.getTwitUser({screen_name: screen_name})
+    return UsersBl.getTwitUser({screen_name: screen_name})
       .then(result => {
-        return UsersBL.upsert(result.data)
+        return UsersBl.upsert(result.data)
           .then(result => console.log)
           .catch(err => {
             if (err) {
@@ -38,9 +38,9 @@ describe('INTEGRATION => users.bl', () => {
 
   it('bl.upsert => inserts the user if not existing (non-authorized user)', () => {
     const screen_name = 'qlik';
-    return UsersBL.getTwitUser({screen_name: screen_name})
+    return UsersBl.getTwitUser({screen_name: screen_name})
       .then(result => {
-        return UsersBL.upsert(result.data)
+        return UsersBl.upsert(result.data)
           .then(result => console.log)
           .catch(err => {
             if (err) {
@@ -52,10 +52,10 @@ describe('INTEGRATION => users.bl', () => {
   });
 
   it('bl.upsert => updates the user if existing', () => {
-    return UsersBL.getTwitUser({screen_name: 'waltherstefan'})
+    return UsersBl.getTwitUser({screen_name: 'waltherstefan'})
       .then(result => {
         // console.log('data', result.data);
-        return UsersBL.upsert(result.data)
+        return UsersBl.upsert(result.data)
           .then(result => console.log)
           .catch(err => {
             if (err) {
@@ -64,5 +64,35 @@ describe('INTEGRATION => users.bl', () => {
             expect(err).to.not.exist;
           });
       });
+  });
+
+  describe('getTwitterId', () => {
+
+    const screen_name = 'waltherstefan';
+    const twitter_id = 17390290;
+
+
+    beforeEach(async () => {
+      return await UsersBl.removeAll();
+    });
+
+    it('returns the twitter_id from DB if a record is existing', async () => {
+
+      const fakeUserId = 111;
+      let usr = {
+        screen_name,
+        twitter_id: fakeUserId
+      };
+      await UsersBl.upsert(usr);
+      let id = await UsersBl.getTwitterId(screen_name);
+      expect(id).to.be.equal(fakeUserId);
+
+    });
+
+    it('fetches the record from Twitter if the record does not exist in DB', async () => {
+      let id = await UsersBl.getTwitterId(screen_name);
+      expect(id).to.be.equal(twitter_id);
+    })
+
   });
 });
