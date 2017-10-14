@@ -30,9 +30,19 @@ class UserHistorySyncSubscriber {
 
       if (['fetch', 'user_existing_rec'].indexOf(result.status) >= 0) {
         let opts = {
-
+          exchange: {
+            type: 'topic',
+            name: 'twitter'
+          },
+          key: 'twitter.cmd.sync.user-history-followers',
+          payload: {
+            screen_name: result.user_history.screen_name,
+            next_cursor: -1,
+            count: 1
+          },
+          correlationId: msgRaw.properties.correlationId
         };
-        await UserHistorySyncSubscriber._publishNextSteps(config.RABBITMQ_CONNECTION, opts);
+        await UserHistorySyncSubscriber._publishNextSteps(opts);
       }
 
     }
@@ -79,8 +89,9 @@ class UserHistorySyncSubscriber {
 
   }
 
-  static async _publishNextSteps() {
+  static async _publishNextSteps(opts) {
 
+    return await AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, opts);
 
   }
 

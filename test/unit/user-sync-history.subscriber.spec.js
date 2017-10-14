@@ -8,7 +8,7 @@ const sinonChai = require('sinon-chai');
 chai.expect();
 chai.use(sinonChai);
 
-describe.only('UNIT => user-sync.subscriber', () => {
+describe('UNIT => user-sync.subscriber', () => {
 
   it('has some required methods', () => {
     expect(UserHistorySyncSubscriber).to.have.a.property('init').to.be.a('function');
@@ -51,7 +51,7 @@ describe.only('UNIT => user-sync.subscriber', () => {
       expect(spyEvent).to.be.calledOnce;
     });
 
-    it.only('in case of result === `fetch`, next steps will be triggered', async () => {
+    it('in case of result === `fetch`, next steps will be triggered', async () => {
 
       let spy = sinon.stub(UserHistorySyncBl, 'syncUserHistory').resolves({status: 'fetch', user_history: {screen_name: 'foo'}});
       let spyEvent = sinon.stub(UserHistorySyncSubscriber, '_publishEvents');
@@ -66,7 +66,7 @@ describe.only('UNIT => user-sync.subscriber', () => {
 
     });
 
-    it.only('in case of result === `user_existing_rec`, next steps will be triggered', async () => {
+    it('in case of result === `user_existing_rec`, next steps will be triggered', async () => {
 
       let spy = sinon.stub(UserHistorySyncBl, 'syncUserHistory').resolves({status: 'fetch', user_history: {screen_name: 'foo'}});
       let spyEvent = sinon.stub(UserHistorySyncSubscriber, '_publishEvents');
@@ -96,5 +96,7 @@ describe.only('UNIT => user-sync.subscriber', () => {
     expect(spyEvent).to.be.calledOnce;
     expect(spyNextSteps).to.be.calledOnce;
   });
+
+
 
 });
