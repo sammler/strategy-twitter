@@ -66,7 +66,7 @@ describe('INTEGRATION => users.bl', () => {
       });
   });
 
-  describe('getTwitterId', () => {
+  describe.only('getTwitterId', () => {
 
     const screen_name = 'waltherstefan';
     const twitter_id = 17390290;

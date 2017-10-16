@@ -9,8 +9,11 @@ class UsersBl {
 
   /**
    * Return an array of followers for the given user.
+   *
    * @param {Object} twitOptions
    * @param {Number} twitOptions.user_id - The user Id to get the followers for.
+   * @param {Number} twitOptions.count - Count of records per page
+   * @param {Number} twitOptions.next_cursor - Twitter's next page' cursor.
    * @param twitConfig
    */
   static async getTwitFollowersIds(twitOptions, twitConfig) {
