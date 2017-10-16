@@ -4,8 +4,8 @@ const config = require('./../../config/config');
 const logger = require('winster').instance();
 const msgTopology = require('./../../config/msg-topology');
 const UserSyncBL = require('./../../modules/user-sync/user-sync.bl');
+const Joi = require('joi');
 
-// Todo: Add _validateMsg
 class UserSyncSubscriber {
 
   static init() {
@@ -17,6 +17,7 @@ class UserSyncSubscriber {
     const logPrefix = `[syncUser:${msgContent.screen_name}]`;
 
     try {
+      UserSyncSubscriber._validateMsg(msgContent, msgRaw);
       let result = await UserSyncBL.syncUser({screen_name: msgContent.screen_name});
       logger.trace(`${logPrefix} full result object => `, result);
       // logger.trace(`${logPrefix} status after syncUser => `, result.status);
@@ -50,9 +51,32 @@ class UserSyncSubscriber {
         result: e,
         correlationId: msgRaw.properties.correlationId
       });
+    }
+  }
 
+  /**
+   * Validates the message the listener is expecting.
+   * @private
+   */
+  static _validateMsg(msgContent, msgRaw) {
+
+    let schemaMsgContent = Joi.object().keys({
+      screen_name: Joi.string().required()
+    });
+    const resultMsgContent = Joi.validate(msgContent, schemaMsgContent);
+    if (resultMsgContent.error) {
+      throw new Error(resultMsgContent.error);
     }
 
+    let schemaMsgRaw = Joi.object().keys({
+      properties: Joi.object().keys({
+        correlationId: Joi.required()
+      }).required()
+    });
+    const resultMsgRaw = Joi.validate(msgRaw, schemaMsgRaw);
+    if (resultMsgRaw.error) {
+      throw new Error(resultMsgRaw.error);
+    }
   }
 
   static async _publishEvents(msg) {

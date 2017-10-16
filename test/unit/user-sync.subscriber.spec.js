@@ -7,7 +7,7 @@ const sinonChai = require('sinon-chai');
 chai.expect();
 chai.use(sinonChai);
 
-describe('UNIT => user-sync.subscriber', () => {
+describe.only('UNIT => user-sync.subscriber', () => {
 
   it('has some required methods', () => {
     expect(UserSyncSubscriber).to.have.a.property('init').to.be.a('function');
@@ -15,6 +15,7 @@ describe('UNIT => user-sync.subscriber', () => {
     expect(UserSyncSubscriber).to.have.a.property('subscriber').to.be.a('function');
     expect(UserSyncSubscriber).to.have.a.property('_publishEvents').to.be.a('function');
     expect(UserSyncSubscriber).to.have.a.property('_publishNextSteps').to.be.a('function');
+    expect(UserSyncSubscriber).to.have.a.property('_validateMsg').to.be.a('function');
   });
 
   it('init calls the subscriber', () => {
@@ -24,6 +25,26 @@ describe('UNIT => user-sync.subscriber', () => {
     spySubscriber.restore();
     expect(spySubscriber).to.be.calledOnce;
   });
+
+  describe('_validateMsg', () => {
+
+    it('validates all required params', () => {
+      try {
+        UserSyncSubscriber._validateMsg({screen_name: 'foo'}, {properties: {correlationId: 1}});
+      } catch (err) {
+        expect(err).to.not.exist;
+      }
+    });
+
+    it('throws an error if required params are missing', () => {
+      try {
+        UserSyncSubscriber._validateMsg({}, {});
+      } catch (err) {
+        expect(err).to.exist;
+      }
+    });
+  });
+
 
   describe('listener', () => {
 
