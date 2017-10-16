@@ -68,7 +68,7 @@ describe('INTEGRATION => users.bl', () => {
       });
   });
 
-  describe.only('getTwitterId', () => {
+  describe('getTwitterId', () => {
 
     // Todo: Can be stored as test-config in one central space ...
     const screen_name = 'waltherstefan';

@@ -38,7 +38,20 @@ describe.only('INTEGRATION => user-followers-sync.bl', () => {
     it('fetches only one record - as defined in params', async () => {
 
       let result = await UserFollowersSyncBl.syncUserFollowers({screen_name: screen_name, user_id: twitter_id, count: 1});
+      expect(result.data.ids).to.exist;
+      expect(result.data.next_cursor).to.exist;
       expect(result.data.ids).to.be.of.length(1);
+
+    });
+
+    it.only('fetching the next record doesn\'t needs the original count parameter', async() => {
+
+      let first = await UserFollowersSyncBl.syncUserFollowers({screen_name: screen_name, user_id: twitter_id, count: 1});
+      let second = await UserFollowersSyncBl.syncUserFollowers({user_id: twitter_id, next_cursor: first.data.next_cursor, count: 1});
+      expect(second.data.errors, 'We have errors, potentially rate limit').to.not.exist;
+      expect(second.data.ids).to.exist;
+      expect(second.data.next_cursor).to.exist;
+      expect(second.data.ids).to.be.of.length(1);
 
     });
 
@@ -47,7 +60,7 @@ describe.only('INTEGRATION => user-followers-sync.bl', () => {
       expect(result.data.ids).to.be.of.length(1);
     });
 
-    it('works with a missing param.twitter_id (fetched from DB)', async () => {
+    xit('works with a missing param.twitter_id (fetched from DB)', async () => {
 
       let usr = {
         screen_name,

@@ -29,6 +29,11 @@ class UserFollowersSyncSubcriber {
         correlationId: msgRaw.properties.correlationId
       });
 
+      // Store each of the followers
+
+      // Publish next steps
+
+
     }
     catch (err) {
       // logger.error(`${logPrefix} publish an unexpected error`, err);

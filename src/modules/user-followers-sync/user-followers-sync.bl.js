@@ -1,6 +1,7 @@
 
 const UsersBl = require('./../users/users.bl');
 const logger = require('winster').instance();
+const _ = require('lodash');
 
 class UserFollowersSyncBl {
 
@@ -11,7 +12,7 @@ class UserFollowersSyncBl {
    */
 
   /**
-   * Fetch the followers ...
+   * Fetch the followers from Twitter.
    *
    * @param opts
    * @param opts.screen_name - The Twitter screen_name.
@@ -27,8 +28,23 @@ class UserFollowersSyncBl {
       logger.verbose('Fetching the user_id for ', opts.screen_name);
       opts.user_id = await UsersBl.getTwitterId(opts.screen_name);
     }
-    return await UsersBl.getTwitFollowersIds(opts, config);
+    let followers = await UsersBl.getTwitFollowersIds(opts, config);
+
+    //UserFollowersSyncBl.handleRateLimit(followers);
+
+    return followers;
   }
+
+  static handleRateLimit(result) {
+    if (result.errors) {
+      if (_.find(result.data.errors, {code: 88})) {
+        throw new Error({message: "Rate limit exceeded", code: 88});
+      } else {
+        throw new Error(result.data.errors);
+      }
+    }
+  }
+
 }
 
 module.exports = UserFollowersSyncBl;
