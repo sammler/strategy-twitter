@@ -10,7 +10,6 @@ const UserFollowersSyncBl = require('./../../../src/modules/user-followers-sync/
 class UserFollowersSyncSubcriber {
 
   static init() {
-    // Todo: A message needs to be published in case of succeeding
     UserFollowersSyncSubcriber.subscriber();
   }
 

@@ -1,6 +1,6 @@
-- [ ] Feat: Store User's history
+- [x] Feat: Store User's history
 - Dev Environment
-  - [ ] Separate test, dev and prod DB
+  - [x] Separate test, dev and prod DB
 - CI/CD
   - [ ] CircleCi Tests
   - [ ] Pushing the Docker image to DockerHub

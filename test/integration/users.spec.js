@@ -27,6 +27,7 @@ xdescribe('Integration:REST => users', () => {
   });
 
   it('GET /v1/twit/users/:id return a user by screen_name', () => {
+    // Todo: Can be stored as test-config in one central space ...
     const screen_name = 'waltherstefan';
     return server
       .get(`/v1/twit/users/${screen_name}`)
@@ -38,6 +39,7 @@ xdescribe('Integration:REST => users', () => {
   });
 
   it('GET /v1/twit/users/by-id:id returns a user by id', () => {
+    // Todo: Can be stored as test-config in one central space ...
     const id = 17390290;
     const screen_name = 'waltherstefan';
     return server

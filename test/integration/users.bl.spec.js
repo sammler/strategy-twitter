@@ -22,6 +22,8 @@ describe('INTEGRATION => users.bl', () => {
   });
 
   it('bl.upsert => inserts the user if not existing (authorized user)', () => {
+
+    // Todo: Can be stored as test-config in one central space ...
     const screen_name = 'waltherstefan';
     return UsersBl.getTwitUser({screen_name: screen_name})
       .then(result => {
@@ -68,9 +70,9 @@ describe('INTEGRATION => users.bl', () => {
 
   describe.only('getTwitterId', () => {
 
+    // Todo: Can be stored as test-config in one central space ...
     const screen_name = 'waltherstefan';
     const twitter_id = 17390290;
-
 
     beforeEach(async () => {
       return await UsersBl.removeAll();

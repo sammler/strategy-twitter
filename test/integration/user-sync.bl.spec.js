@@ -37,6 +37,7 @@ describe('INTEGRATION => user-sync.bl', () => {
 
   it('updates an existing user if one is stored and older than 24hrs', async () => {
 
+    // Todo: Can be stored as test-config in one central space ...
     const screen_name = 'waltherstefan';
     const twitter_id = 17390290;
 
@@ -68,6 +69,7 @@ describe('INTEGRATION => user-sync.bl', () => {
 
   it('doesn\'t do anything if there is a user, not older thant 24hrs', async () => {
 
+    // Todo: Can be stored as test-config in one central space ...
     const screen_name = 'waltherstefan';
     const twitter_id = 17390290;
 

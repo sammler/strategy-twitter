@@ -5,6 +5,7 @@ const UserHistoryBL = require('./../../src/modules/user-history/user-history.bl'
 const UsersBL = require('./../../src/modules/users/users.bl');
 const moment = require('moment');
 
+// Todo: Can be stored as test-config in one central space ...
 const screen_name = 'waltherstefan';
 const twitter_id = 17390290;
 
@@ -93,7 +94,7 @@ describe('Integration => users-history-sync.bl', () => {
     };
 
     // First insert the reference record
-    let user = await UsersBL.upsert(usr);
+    await UsersBL.upsert(usr);
 
     // Sync UserHistory, the record should be taken, nothing else
     let userHistoryResult = await UserHistorySyncBL.syncUserHistory({screen_name});
@@ -108,16 +109,5 @@ describe('Integration => users-history-sync.bl', () => {
     let userHistoryCount = await UserHistoryBL.count();
     expect(userHistoryCount).to.be.equal(1);
   });
-
-
-  // Todo: too generic, remove ...
-  it('syncs the user history', async () => {
-    const screen_name = 'waltherstefan';
-    let userHistoryResult = await UserHistorySyncBL.syncUserHistory({screen_name: screen_name});
-    expect(userHistoryResult).to.exist;
-  });
-
-
-
 
 });
