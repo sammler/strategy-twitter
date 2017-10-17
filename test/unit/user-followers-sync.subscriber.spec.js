@@ -7,7 +7,7 @@ const sinonChai = require('sinon-chai');
 chai.expect();
 chai.use(sinonChai);
 
-describe.only('UNIT => user-history-followers.subscriber', () => {
+describe('UNIT => user-history-followers.subscriber', () => {
 
   it('has some required methods', () => {
     expect(UserFollowersSyncSubscriber).to.have.a.property('init').to.be.a('function');

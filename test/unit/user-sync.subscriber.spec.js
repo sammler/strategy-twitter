@@ -7,7 +7,7 @@ const sinonChai = require('sinon-chai');
 chai.expect();
 chai.use(sinonChai);
 
-describe.only('UNIT => user-sync.subscriber', () => {
+describe('UNIT => user-sync.subscriber', () => {
 
   it('has some required methods', () => {
     expect(UserSyncSubscriber).to.have.a.property('init').to.be.a('function');

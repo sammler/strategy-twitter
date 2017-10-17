@@ -16,6 +16,7 @@ describe('UNIT => user-sync.subscriber', () => {
     expect(UserHistorySyncSubscriber).to.have.a.property('subscriber').to.be.a('function');
     expect(UserHistorySyncSubscriber).to.have.a.property('_publishEvents').to.be.a('function');
     expect(UserHistorySyncSubscriber).to.have.a.property('_publishNextSteps').to.be.a('function');
+    expect(UserHistorySyncSubscriber).to.have.a.property('_validateMsg').to.be.a('function');
   });
 
   it('init calls the subscriber', () => {
@@ -24,6 +25,25 @@ describe('UNIT => user-sync.subscriber', () => {
 
     spySubscriber.restore();
     expect(spySubscriber).to.be.calledOnce;
+  });
+
+  describe('_validateMsg', () => {
+
+    it('validates all required params', () => {
+      try {
+        UserHistorySyncSubscriber._validateMsg({screen_name: 'foo'}, {properties: {correlationId: 1}});
+      } catch (err) {
+        expect(err).to.not.exist;
+      }
+    });
+
+    it('throws an error if required params are missing', () => {
+      try {
+        UserHistorySyncSubscriber._validateMsg({}, {});
+      } catch (err) {
+        expect(err).to.exist;
+      }
+    });
   });
 
   describe('listener', () => {

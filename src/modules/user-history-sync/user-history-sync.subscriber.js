@@ -4,8 +4,8 @@ const config = require('./../../config/config');
 const logger = require('winster').instance();
 const msgTopology = require('./../../config/msg-topology');
 const UserHistorySyncBL = require('./user-history-sync.bl');
+const Joi = require('joi');
 
-// Todo: Add _validateMsg
 class UserHistorySyncSubscriber {
 
   static init() {
@@ -18,6 +18,7 @@ class UserHistorySyncSubscriber {
 
     try {
 
+      UserHistorySyncSubscriber._validateMsg(msgContent, msgRaw);
       let result = await UserHistorySyncBL.syncUserHistory(msgContent);
       // logger.trace(`${logPrefix} full result object => `, result);
 
@@ -59,6 +60,27 @@ class UserHistorySyncSubscriber {
       });
     }
   }
+
+  static _validateMsg(msgContent, msgRaw) {
+    const schemaMsgContent = Joi.object().keys({
+      screen_name: Joi.string().required()
+    });
+    const resultMsgContent = Joi.validate(msgContent, schemaMsgContent);
+    if (resultMsgContent.error) {
+      throw new Error(resultMsgContent.error);
+    }
+
+    const schemaMsgRaw = Joi.object().keys({
+      properties: Joi.object().keys({
+        correlationId: Joi.required()
+      }).required()
+    });
+    const resultMsgRaw = Joi.validate(msgRaw, schemaMsgRaw);
+    if (resultMsgRaw.error) {
+      throw new Error(resultMsgRaw.error);
+    }
+  }
+
 
   static subscriber() {
 

@@ -74,6 +74,7 @@ class UserFollowersSyncSubcriber {
    *
    *
    */
+  // Todo(doc)
   static subscriber() {
 
     const subOpts = _.find(msgTopology, {key: 'twitter.cmd.sync.user-followers'});
