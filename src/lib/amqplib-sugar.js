@@ -64,10 +64,12 @@ class AmqpSugarLib {
       .then(conn => {
         conn.createChannel()
           .then(channel => {
-            channel.assertExchange(opts.exchange.name, opts.exchange.type, {durable: true});
+            channel.assertExchange(opts.exchange.name, opts.exchange.type, opts.exchange.arguments || {});
             channel.publish(opts.exchange.name, opts.key, encode(opts.payload), opts.options);
             if (logDetail) {
-              logger.trace(`[AMQP][publish] ${opts.key}: ${JSON.stringify(opts.payload, null)}, correlationId: ${opts.options.correlationId}`);
+              if (opts.options && opts.options.correlationId) {
+                logger.trace(`[AMQP][publish] ${opts.key}: ${JSON.stringify(opts.payload, null)}, correlationId: ${opts.options.correlationId}`);
+              }
             }
             setTimeout(() => {
               channel.close();
@@ -195,9 +197,9 @@ class AmqpSugarLib {
           .catch(retry);
 
       });
-    } 
+    }
     return Promise.resolve(connection);
-    
+
   }
 
   static _validateConnectOptions(opts) {

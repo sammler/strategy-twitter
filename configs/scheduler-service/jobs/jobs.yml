@@ -1,10 +1,12 @@
 jobs:
   - name: job-twitter.cmd.sync-user
-    enabled: true
+    enabled: false
     strategy: interval
     exchange:
       type: topic
       name: twitter
+      arguments:
+        durable: true
     key: twitter.cmd.sync.user
     payload:
       screen_name: waltherstefan
@@ -12,3 +14,20 @@ jobs:
     interval: 20000
     options:
       correlationId: "{{correlation_id}}"
+  - name: job-twitter.delayed-msg
+    enabled: false
+    strategy: interval
+    exchange:
+      type: x-delayed-message
+      x-delayed-type: topic
+      name: test
+      arguments:
+        durable: true
+        x-delayed-type: topic
+    key: system.delayed-msg
+    payload:
+      ts: "{{now}}"
+    interval: 10000
+    options:
+      headers:
+        x-delay: 5000

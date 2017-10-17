@@ -27,3 +27,12 @@
   - count
   queue:
     name: twitter-sync-user-followers_queue
+
+- exchange:
+    type: x-delayed-message
+    x-delayed-type: topic
+    name: test
+    arguments:
+      durable: true
+      x-delayed-type: topic
+    key: system.delayed-msg
