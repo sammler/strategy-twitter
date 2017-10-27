@@ -59,7 +59,9 @@ class AmqpSugarLib {
    *
    * @returns {Promise.<TResult>}
    */
+  //Todo: Refactor, see e.g. https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/issues/92
   static publishMessage(connOpts, opts) {
+
     return AmqpSugarLib._connect(connOpts)
       .then(conn => {
         conn.createChannel()

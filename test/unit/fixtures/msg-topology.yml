@@ -1,0 +1,16 @@
+exchanges:
+  - id: cmd.sync.user
+    key: twitter.cmd.sync.user
+    payload:
+      screen_name: ''
+      s5r_user_id: ''
+    meta:
+      type: topic
+      name: twitter
+  - id: cmd.sync.user-history
+    key: twitter.cmd.sync-user-history
+    
+queues:
+  - id: sync-user
+    for: cmd.sync.user
+    name: twitter-sync-user__queue

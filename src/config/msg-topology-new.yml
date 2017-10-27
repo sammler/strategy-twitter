@@ -1,3 +1,51 @@
 exchanges:
+  - id: cmd.sync.user
+    key: twitter.cmd.sync.user
+    exchange:
+      type: topic
+      name: twitter
+      arguments:
+        durable: true
+    payload:
+      screen_name: "{{screen_name}}"
+      s5r_user_id: "{{s5r_user_id}}"
+    options:
+      correlationId: "{{correlation_id}}"
+
+  - id: sync.user.event-log
+    key: twitter.sync.user.event-log
+    exchange:
+      type: topic
+      name: twitter
+    payload:
+      action: "{{action}}"
+      status: "{{status}}"
+      result: "{{result}}"
+    options:
+      correlationId: "{{correlation_id}}"
+
+  - id: cmd.sync.user-history
+    key: twitter.cmd.sync.user-history
+    exchange:
+      type: topic
+      name: twitter
+    payload:
+      screen_name: "{{screen_name}}"
+      next_cursor: "{{next_cursor}}"
+      count: "{{count}}"
+
+
+
+  - id: cmd.sync.user-history
+    key: twitter.cmd.sync-user-history
+
+
+
 
 queues:
+  - id: sync-user
+    for: cmd.sync.user
+    name: twitter-sync-user__queue
+  - id: sync-uster-history
+    for: cmd.sync.user-history
+    name: twitter-sync-user-followers__queue

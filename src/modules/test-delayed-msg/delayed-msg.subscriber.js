@@ -7,7 +7,7 @@ const msgTopology = require('./../../config/msg-topology');
 
 class DelayedMsgSubscriber {
   static init() {
-    DelayedMsgSubscriber.subscriber();
+    //DelayedMsgSubscriber.subscriber();
   }
 
   static listener(msgContent, msgRaw) {
@@ -22,15 +22,17 @@ class DelayedMsgSubscriber {
     return Promise.resolve();
   }
 
-  static subscriber() {
+  static async subscriber() {
 
     const pubOptions = {
       exchange: {
-        type: 'x-delayed-message',
+        type: "x-delayed-message",
         name: 'test',
         arguments: {
           durable: true,
-          'x-delayed-type': 'topic'
+          arguments: {
+            "x-delayed-type": "topic"
+          }
         }
       },
       key: 'system.delayed-msg',
@@ -44,30 +46,24 @@ class DelayedMsgSubscriber {
       }
     };
 
-    console.log('xx', pubOptions);
+    // console.log('xx', pubOptions);
 
     // first publish
-    AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, pubOptions)
-      .then(() => {
+    await AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, pubOptions);
 
-        // then subscribe
-        const opts = {
-          exchange: {
-            type: 'x-delayed-message',
-            name: 'test'
-          },
-          key: 'system.delayed-msg',
-          queue: {
-            name: 'system.delayed-msg__queue'
-          }
-        };
+    // then subscribe
+    const opts = {
+      exchange: {
+        type: 'x-delayed-message',
+        name: 'test'
+      },
+      key: 'system.delayed-msg',
+      queue: {
+        name: 'system.delayed-msg__queue'
+      }
+    };
 
-        AmqpSugar.subscribeMessage(config.RABBITMQ_CONNECTION, opts, DelayedMsgSubscriber.listener)
-          .catch(err => {
-            logger.error(`Error subscribing to ${opts.queue.name}`, err);
-          });
-      });
-
+    await AmqpSugar.subscribeMessage(config.RABBITMQ_CONNECTION, opts, DelayedMsgSubscriber.listener);
   }
 }
 

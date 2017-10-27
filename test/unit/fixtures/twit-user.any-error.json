@@ -1,0 +1,10 @@
+{
+  "data": {
+    "errors": [
+      {
+        "message": "Whatever error",
+        "code": 100
+      }
+    ]
+  }
+}

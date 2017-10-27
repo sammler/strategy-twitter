@@ -21,6 +21,16 @@ describe('INTEGRATION => users.bl', () => {
     return UsersBl.removeAll();
   });
 
+  it('bl.getTwitUser gets the user', async () => {
+    const screen_name = 'waltherstefan';
+    let result = await UsersBl.getTwitUser({screen_name});
+    expect(result).to.exist;
+    expect(result).to.have.a.property('data').to.be.an('object');
+    expect(result.data).to.have.a.property('screen_name').to.equals(screen_name);
+    expect(result).to.have.a.property('resp').to.be.an('object');
+    expect(result.resp.statusCode).to.be.equal(200);
+  });
+
   it('bl.upsert => inserts the user if not existing (authorized user)', () => {
 
     // Todo: Can be stored as test-config in one central space ...

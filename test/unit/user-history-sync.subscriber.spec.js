@@ -1,4 +1,3 @@
-const UserHistoryBl = require('./../../src/modules/user-history/user-history.bl');
 const UserHistorySyncBl = require('./../../src/modules/user-history-sync/user-history-sync.bl');
 const UserHistorySyncSubscriber = require('./../../src/modules/user-history-sync/user-history-sync.subscriber');
 
@@ -8,7 +7,7 @@ const sinonChai = require('sinon-chai');
 chai.expect();
 chai.use(sinonChai);
 
-describe('UNIT => user-sync.subscriber', () => {
+describe('UNIT => user-history-sync.subscriber', () => {
 
   it('has some required methods', () => {
     expect(UserHistorySyncSubscriber).to.have.a.property('init').to.be.a('function');
@@ -116,7 +115,5 @@ describe('UNIT => user-sync.subscriber', () => {
     expect(spyEvent).to.be.calledOnce;
     expect(spyNextSteps).to.be.calledOnce;
   });
-
-
 
 });

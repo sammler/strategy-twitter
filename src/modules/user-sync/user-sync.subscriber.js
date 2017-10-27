@@ -12,16 +12,27 @@ class UserSyncSubscriber {
     UserSyncSubscriber.subscriber();
   }
 
+  static subscriber() {
+
+    let subOpts = _.find(msgTopology, {key: 'twitter.cmd.sync.user'});
+
+    AmqpSugar.subscribeMessage(config.RABBITMQ_CONNECTION, subOpts, UserSyncSubscriber.listener)
+      .catch(err => {
+        // Todo: logger.error doesn't work here?
+        console.error(`Error subscribing to ${subOpts.queue.name}`, err);
+      });
+  }
+
   static async listener(msgContent, msgRaw) {
 
     const logPrefix = `[syncUser:${msgContent.screen_name}]`;
 
     try {
       UserSyncSubscriber._validateMsg(msgContent, msgRaw);
+
+      // Todo(AAA): Here we have an issue, as we could hit the rate-limit and should re-publish
       let result = await UserSyncBL.syncUser({screen_name: msgContent.screen_name});
       logger.trace(`${logPrefix} full result object => `, result);
-      // logger.trace(`${logPrefix} status after syncUser => `, result.status);
-      // logger.trace(`${logPrefix} user after syncUser => `, result.user);
 
       await UserSyncSubscriber._publishEvents({
         status: result.status,
@@ -33,22 +44,23 @@ class UserSyncSubscriber {
       });
 
       // Todo: Needs some refactoring to also publish the events like twitter.user.created, twitter.user.updated, etc.
-      //       (makes sense to first implement the msg-topology library)
+      // Todo: (makes sense to first implement the msg-topology library)
       // Now let's publish
       // - twitter.user.synced (should contain what we have done) <== NOT IMPLEMENTED, YET
       // - twitter.cmd.sync.user-history
-      if (['updated', 'created'].indexOf(result.status) >= 0) {
+      if (['updated', 'created'].indexOf(result.status) > -1) {
         logger.trace(`${logPrefix} publish the next steps`);
         await UserSyncSubscriber._publishNextSteps(result.user);
+      } else if (['error-rate-limit-hit'].indexOf(result.status) > -1) {
+        await UserSyncSubscriber._publishRetry();
       }
 
     }
-    catch (e) {
-      // Todo: introduce the notion of _publishError ... makes unit testing easier and more reliable
-      logger.trace(`${logPrefix} publish an unexpected error`);
-      await UserSyncSubscriber._publishEvents({
+    catch (err) {
+      logger.trace(`${logPrefix} publish an unexpected error`, err);
+      await UserSyncSubscriber._publishError({
         status: 'error',
-        result: e,
+        result: err,
         correlationId: msgRaw.properties.correlationId
       });
     }
@@ -101,8 +113,30 @@ class UserSyncSubscriber {
     return await AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, opts);
   }
 
+  static async _publishError(msg) {
+    // Todo: load from topology
+    let opts = {
+      exchange: {
+        type: 'topic',
+        name: 'twitter'
+      },
+      key: 'twitter.sync.user.event-log',
+      payload: {
+        action: 'twitter.sync.user-sync',
+        status: msg.status,
+        result: msg.result
+      },
+      options: {
+        correlationId: msg.correlationId
+      }
+    };
+
+    return await AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, opts);
+  }
+
   static async _publishNextSteps(msg) {
 
+    // Todo: Change msgTopology
     let pubOpts = _.find(msgTopology, {key: 'twitter.cmd.sync.user-history'});
 
     // Todo: this should ideally be dynamic, ... somehow
@@ -112,16 +146,27 @@ class UserSyncSubscriber {
     return await AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, pubOpts);
   }
 
-  static subscriber() {
+  // Todo: As cloudamqp is not allowing to use plugins, we might look for other options of delaying a msg without using a plugin ...
+  static async _publishRetry(msg) {
 
-    let subOpts = _.find(msgTopology, {key: 'twitter.cmd.sync.user'});
+    return Promise.resolve();
 
-    AmqpSugar.subscribeMessage(config.RABBITMQ_CONNECTION, subOpts, UserSyncSubscriber.listener)
-      .catch(err => {
-        // Todo: logger.error doesn't work here?
-        console.error(`Error subscribing to ${subOpts.queue.name}`, err);
-      });
+    // const opts = {
+    //   exchange: {
+    //     type: 'x-delayed-message',
+    //     arguments: {
+    //       durable: true,
+    //       arguments: {
+    //         'x-delayed-type': 'topic'
+    //       }
+    //
+    //     }
+    //   }
+    // };
+    // return await AmqpSugar.publishMessage(config.RABBITMQ_CONNECTION, opts);
+
   }
+
 }
 
 module.exports = UserSyncSubscriber;

@@ -14,6 +14,7 @@ jobs:
     interval: 20000
     options:
       correlationId: "{{correlation_id}}"
+
   - name: job-twitter.delayed-msg
     enabled: false
     strategy: interval
