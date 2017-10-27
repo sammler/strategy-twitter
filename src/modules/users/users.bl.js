@@ -36,10 +36,10 @@ class UsersBl {
     let dbUser = await UsersBl.get({screen_name});
     if (dbUser && dbUser._doc) {
       return dbUser.twitter_id;
-    } else {
-      let twitUser = await UsersBl.getTwitUser({screen_name});
-      return twitUser.data.id;
-    }
+    } 
+    let twitUser = await UsersBl.getTwitUser({screen_name});
+    return twitUser.data.id;
+    
   }
 
   /**
@@ -78,7 +78,7 @@ class UsersBl {
    * @param {object} query - Query definition to be passed to mongoose' `findOne`.
    * @returns {Query|*}
    */
-  static  get(query) {
+  static get(query) {
     return UsersModel
       .findOne(query);
   }

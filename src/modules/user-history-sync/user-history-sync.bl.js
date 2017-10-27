@@ -88,7 +88,7 @@ class UserHistorySyncBl {
     return {
       status,
       user_history
-    }
+    };
   }
 
   static async _fetchUser(opts) {

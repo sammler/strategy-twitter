@@ -77,7 +77,7 @@ describe('UNIT => user-history-followers.subscriber', () => {
 
     xit('', async () => {
       expect(false).to.be.true;
-    })
+    });
 
   });
 

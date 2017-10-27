@@ -12,6 +12,7 @@ class UserHistorySyncSubscriber {
     UserHistorySyncSubscriber.subscriber();
   }
 
+  // Todo: Still very unlikely, that we hit the rate-limit here, but it should be implemented
   static async listener(msgContent, msgRaw) {
 
     const logPrefix = `[syncUserHistory:${msgContent.screen_name}]`;
@@ -49,8 +50,7 @@ class UserHistorySyncSubscriber {
         await UserHistorySyncSubscriber._publishNextSteps(opts);
       }
 
-    }
-    catch(err) {
+    } catch (err) {
       // Todo: introduce the notion of _publishError ... makes unit testing easier and more reliable
       logger.error(`${logPrefix} publish an unexpected error`, err);
       await UserHistorySyncSubscriber._publishEvents({
@@ -80,7 +80,6 @@ class UserHistorySyncSubscriber {
       throw new Error(resultMsgRaw.error);
     }
   }
-
 
   static subscriber() {
 

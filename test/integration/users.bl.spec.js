@@ -104,7 +104,7 @@ describe('INTEGRATION => users.bl', () => {
     it('fetches the record from Twitter if the record does not exist in DB', async () => {
       let id = await UsersBl.getTwitterId(screen_name);
       expect(id).to.be.equal(twitter_id);
-    })
+    });
 
   });
 });

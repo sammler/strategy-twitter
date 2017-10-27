@@ -30,7 +30,7 @@ class UserFollowersSyncBl {
     }
     let followers = await UsersBl.getTwitFollowersIds(opts, config);
 
-    //UserFollowersSyncBl.handleRateLimit(followers);
+    // UserFollowersSyncBl.handleRateLimit(followers);
 
     return followers;
   }
@@ -38,7 +38,7 @@ class UserFollowersSyncBl {
   static handleRateLimit(result) {
     if (result.errors) {
       if (_.find(result.data.errors, {code: 88})) {
-        throw new Error({message: "Rate limit exceeded", code: 88});
+        throw new Error({message: 'Rate limit exceeded', code: 88});
       } else {
         throw new Error(result.data.errors);
       }

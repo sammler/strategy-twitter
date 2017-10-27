@@ -1,6 +1,5 @@
 const UserSyncSubscriber = require('./../../src/modules/user-sync/user-sync.subscriber');
 const UserSyncBl = require('./../../src/modules/user-sync/user-sync.bl');
-const UsersBl = require('./../../src/modules/users/users.bl');
 
 const chai = require('chai');
 const sinon = require('sinon');
@@ -46,7 +45,6 @@ describe('UNIT => user-sync.subscriber', () => {
       }
     });
   });
-
 
   describe('listener', () => {
 
@@ -127,7 +125,7 @@ describe('UNIT => user-sync.subscriber', () => {
 
     });
 
-    it.only('if the rate-limit is hit, a delayed msg will be published', async () => {
+    it('if the rate-limit is hit, a delayed msg will be published', async () => {
 
       let stub_syncUser = sinon.stub(UserSyncBl, 'syncUser').resolves({status: 'error-rate-limit-hit', user: {screen_name: 'foo', twitter_id: 1}});
       let stub_publishEvents = sinon.stub(UserSyncSubscriber, '_publishEvents').resolves();

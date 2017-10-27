@@ -28,7 +28,6 @@ describe('INTEGRATION => user-followers-sync.bl', () => {
     return UsersBl.removeAll();
   });
 
-
   it('has the required functions', () => {
     expect(UserFollowersSyncBl).to.have.a.property('syncUserFollowers').to.be.a('function');
   });
@@ -44,7 +43,7 @@ describe('INTEGRATION => user-followers-sync.bl', () => {
 
     });
 
-    it('fetching the next record doesn\'t needs the original count parameter', async() => {
+    it('fetching the next record doesn\'t needs the original count parameter', async () => {
 
       let first = await UserFollowersSyncBl.syncUserFollowers({screen_name: screen_name, user_id: twitter_id, count: 1});
       let second = await UserFollowersSyncBl.syncUserFollowers({user_id: twitter_id, next_cursor: first.data.next_cursor, count: 1});

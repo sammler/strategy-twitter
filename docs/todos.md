@@ -6,5 +6,5 @@
   - [ ] Pushing the Docker image to DockerHub
   - [ ] Enable Greenkeeper
   - [ ] Enable CodeCov
-  - [ ] Running tests in a temporary container
+  - [ ] Running tests in a temporary test container
 - [ ] OpenAPI

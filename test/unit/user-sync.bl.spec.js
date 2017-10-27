@@ -81,8 +81,8 @@ describe('UNIT => user-sync.bl', () => {
       expect(result).to.have.a.property('status').to.be.equal('error-rate-limit-hit');
       expect(result).to.have.a.property('errors').to.not.be.null;
       expect(result.errors).to.deep.contain({
-        "code": 88,
-        "message": "Rate limit exceeded"
+        code: 88,
+        message: 'Rate limit exceeded'
       });
     });
 
@@ -98,12 +98,10 @@ describe('UNIT => user-sync.bl', () => {
 
       try {
         await UserSyncBl._twitUpdateUser(screen_name);
-      }
-      catch (ex) {
+      } catch (ex) {
         expect(ex).to.exist;
-        expect(ex).to.deep.equal([{message: 'Rate limit exceeded', code: 88}])
-      }
-      finally {
+        expect(ex).to.deep.equal([{message: 'Rate limit exceeded', code: 88}]);
+      } finally {
         spyUsersBl_getTwitUser.restore();
       }
     });
@@ -117,11 +115,9 @@ describe('UNIT => user-sync.bl', () => {
 
       try {
         await UserSyncBl._twitUpdateUser(screen_name);
-      }
-      catch (ex) {
+      } catch (ex) {
         expect(ex).to.not.exist;
-      }
-      finally {
+      } finally {
         spyUsersBl_upsert.restore();
         spyUsersBl_getTwitUser.restore();
       }

@@ -68,7 +68,7 @@ class UserSyncBl {
       } catch (ex) {
         status = 'error';
         errors = ex.data.errors;
-        if(_.find(ex.data.errors, {code: 88})) {
+        if (_.find(ex.data.errors, {code: 88})) {
           status = 'error-rate-limit-hit';
         }
       }

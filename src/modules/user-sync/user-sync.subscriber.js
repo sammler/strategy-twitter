@@ -55,8 +55,7 @@ class UserSyncSubscriber {
         await UserSyncSubscriber._publishRetry();
       }
 
-    }
-    catch (err) {
+    } catch (err) {
       logger.trace(`${logPrefix} publish an unexpected error`, err);
       await UserSyncSubscriber._publishError({
         status: 'error',
@@ -147,7 +146,7 @@ class UserSyncSubscriber {
   }
 
   // Todo: As cloudamqp is not allowing to use plugins, we might look for other options of delaying a msg without using a plugin ...
-  static async _publishRetry(msg) {
+  static async _publishRetry(/* msg */) {
 
     return Promise.resolve();
 

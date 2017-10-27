@@ -1,16 +1,16 @@
 const _ = require('lodash');
 const AmqpSugar = require('./../../lib/amqplib-sugar');
 const config = require('./../../config/config');
-const logger = require('winster').instance();
+// const logger = require('winster').instance();
 const moment = require('moment');
-const msgTopology = require('./../../config/msg-topology');
+// const msgTopology = require('./../../config/msg-topology');
 
 class DelayedMsgSubscriber {
   static init() {
-    //DelayedMsgSubscriber.subscriber();
+    // DelayedMsgSubscriber.subscriber();
   }
 
-  static listener(msgContent, msgRaw) {
+  static listener(msgContent /* , msgRaw */) {
 
     let ts = moment(new Date(JSON.parse(msgContent.ts)));
     let now = moment();
@@ -26,18 +26,18 @@ class DelayedMsgSubscriber {
 
     const pubOptions = {
       exchange: {
-        type: "x-delayed-message",
+        type: 'x-delayed-message',
         name: 'test',
         arguments: {
           durable: true,
           arguments: {
-            "x-delayed-type": "topic"
+            'x-delayed-type': 'topic'
           }
         }
       },
       key: 'system.delayed-msg',
       payload: {
-        ts: JSON.stringify(new Date()),
+        ts: JSON.stringify(new Date())
       },
       options: {
         headers: {

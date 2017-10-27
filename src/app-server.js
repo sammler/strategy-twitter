@@ -40,7 +40,7 @@ class AppServer {
     subscriberConfig.init();
   }
 
-  async _initRabbitMQ() {
+  async _initRabbitMQConnection() {
     return await AmqpSugar._connect(this.config.RABBITMQ_URI);
   }
 
@@ -82,14 +82,11 @@ class AppServer {
     });
   }
 
-  stop() {
-    this.mongooseConnection.disconnect()
-      .then(() => {
-        if (this.server) {
-          this.server.close();
-        }
-      })
-      .catch(err => this.logger.error(err));
+  async stop() {
+    await this.mongooseConnection.disconnect();
+    if (this.server) {
+      this.server.close();
+    }
   }
 }
 

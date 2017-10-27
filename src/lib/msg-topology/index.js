@@ -5,13 +5,16 @@ const logger = require('winster').instance();
 const _ = require('lodash');
 
 const defaultConfig = {
-  file: {
-    location: path.join(__dirname, './../../config/msg-topology.yml')
-  }
+  topology_file: path.join(__dirname, './../../config/msg-topology.yml')
 };
 
 class MsgTopology {
 
+  /**
+   *
+   * @param config
+   * @param {String} config.topology_file
+   */
   constructor(config) {
     this.config = _.extend(defaultConfig, config);
     this.topology = null;
@@ -20,7 +23,7 @@ class MsgTopology {
 
   _init() {
     try {
-      this.topology = yaml.safeLoad(fs.readFileSync(this.config.file.location, 'utf8'));
+      this.topology = yaml.safeLoad(fs.readFileSync(this.config.topology_file, 'utf8'));
     } catch (err) {
       logger.error('Error loading msg-topology.yml', err);
     }
@@ -30,14 +33,14 @@ class MsgTopology {
     return _.find(this.topology.exchanges, {id});
   }
   getExchangeBy(query) {
-    return _.find(this.topology.exchanges, query);
+    return _.filter(this.topology.exchanges, query);
   }
 
   getQueue(id) {
     return _.find(this.topology.queues, {id});
   }
   getQueueBy(query) {
-    return _.find(this.topology.queues, query);
+    return _.filter(this.topology.queues, query);
   }
 
 }

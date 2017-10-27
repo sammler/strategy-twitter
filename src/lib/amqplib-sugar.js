@@ -14,6 +14,7 @@ const logDetail = true;
 // Todo: Still doesn't work ...
 var connection = null;
 
+// Todo: Move to async/await
 /**
  * Sugar methods to work with amqplib.
  */
@@ -59,7 +60,7 @@ class AmqpSugarLib {
    *
    * @returns {Promise.<TResult>}
    */
-  //Todo: Refactor, see e.g. https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/issues/92
+  // Todo: Refactor, see e.g. https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/issues/92
   static publishMessage(connOpts, opts) {
 
     return AmqpSugarLib._connect(connOpts)

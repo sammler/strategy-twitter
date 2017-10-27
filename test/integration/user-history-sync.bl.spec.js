@@ -42,7 +42,7 @@ describe('Integration => users-history-sync.bl', () => {
         statuses_count: -1,
         listed_count: -1,
         followers_count: -1
-      },
+      }
     };
 
     // First insert the reference record
@@ -64,7 +64,7 @@ describe('Integration => users-history-sync.bl', () => {
 
   });
 
-  it('still fetches a new record, if the user is not existing (should not happen, but ...)', async() => {
+  it('still fetches a new record, if the user is not existing (should not happen, but ...)', async () => {
 
     // Sync UserHistory, the record should be taken, nothing else
     let userHistoryResult = await UserHistorySyncBL.syncUserHistory({screen_name});

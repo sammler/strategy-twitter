@@ -15,7 +15,7 @@ class UserFollowersSyncSubcriber {
 
   static async listener(msgContent, msgRaw) {
 
-    const logPrefix = `[syncUserHistory:${msgContent.screen_name}]`;
+    const logPrefix = `[syncUserHistory:${msgContent.screen_name}]`; // eslint-disable-line no-unused-vars
 
     try {
       UserFollowersSyncSubcriber._validateMsg();
@@ -33,9 +33,7 @@ class UserFollowersSyncSubcriber {
 
       // Publish next steps
 
-
-    }
-    catch (err) {
+    } catch (err) {
       // logger.error(`${logPrefix} publish an unexpected error`, err);
       await UserFollowersSyncSubcriber._publishError({
         status: 'error',
