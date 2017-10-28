@@ -17,8 +17,7 @@ const schema = new Schema({
   profile: {
     type: Object
   },
-  // Todo: We should rename this to last_sync_utc_ts to prevent confusions and errors ...
-  last_sync_ts: {
+  last_sync_utc_ts: {
     type: Schema.Types.Date,
     required: true,
     default: Lib.nowUtc()

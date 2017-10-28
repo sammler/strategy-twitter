@@ -1,0 +1,18 @@
+{
+  "data": {
+    "favorites_count": 1,
+    "followers_count": 2,
+    "following": false,
+    "friends_count": 3,
+    "id": 17390290,
+    "id_str": "17390290",
+    "listed_count": 4,
+    "name": "Stefan Walther",
+    "screen_name": "waltherstefan",
+    "statuses_count": 5    
+  },
+  "resp": {
+    "statusCode": 200,
+    "statusMessage": "OK"
+  }
+}

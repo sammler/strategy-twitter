@@ -5,22 +5,21 @@ describe('Integration => users', () => {
 
   let server;
   let appServer;
-  before(() => {
-    return testLib.init('db-only').then(result => {
-      server = result.superTest;
-      appServer = result.appServer;
-    });
+  before(async () => {
+    let result = await testLib.init('db-only');
+    server = result.superTest;
+    appServer = result.appServer;
   });
 
-  after(() => {
+  after(async () => {
     if (appServer) {
-      return appServer.stop();
+      return await appServer.stop();
     }
     return Promise.resolve();
   });
 
-  beforeEach(() => {
-    return UsersBL.removeAll();
+  beforeEach(async () => {
+    return await UsersBL.removeAll();
   });
 
   it('Get FollowerIDs - passed identity', () => {

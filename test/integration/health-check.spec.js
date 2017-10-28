@@ -4,7 +4,7 @@ const findPkg = require('find-pkg');
 const pkg = require(findPkg.sync('.'));
 const testLib = require('./../lib');
 
-describe('Integration => health-check', () => {
+xdescribe('Integration => health-check', () => {
 
   let server;
   before(() => {

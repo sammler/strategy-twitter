@@ -9,19 +9,25 @@ function encode(doc) {
   return new Buffer(JSON.stringify(doc));
 }
 
+const logDetail = true;
+
+// Todo: Still doesn't work ...
 var connection = null;
 
+// Todo: Move to async/await
 /**
  * Sugar methods to work with amqplib.
  */
 class AmqpSugarLib {
 
+  // Todo: Doc needs to be revisited
   /**
    * RabbitMQ Server definition.
    *
    * @typedef {string} rabbitConnectionDef - Connection string of the server.
    */
 
+  // Todo: Doc needs to be revisited
   /**
    * Retry behavior in case RabbitMQ is not available.
    *
@@ -39,35 +45,39 @@ class AmqpSugarLib {
   /**
    * Post a message to RabbitMq.
    *
+   * @param {object} connOpts - Connection options.
+   * @param {string} connOpts.server - The RabbitMQ connection Url.
+   *
    * @param {object} opts - Configuration to use to publish a message.
-   * @param {string} opts.server - RabbitMQ server. If a string is passed, it's just the URI.
    * @param {object} opts.exchange - Information about the exchange.
    * @param {string} opts.exchange.type - 'topic', 'direct'
    * @param {string} opts.exchange.name - Name of the exchange.
    * @param {string} opts.key - Key to publish the message.
    * @param {object} opts.payload - The message to post.
    * @param {Object} opts.options - Options to publish.
-   * @param {string} [opts.correlationId] - RabbitMQ's correlationId.
+   * @param {string} [opts.options.correlationId] - RabbitMQ's correlationId.
    * @param {retry_behavior} [opts.retry_behavior] - Retry behavior.
    *
-   * @returns {Promise}
+   * @returns {Promise.<TResult>}
    */
-  static publishMessage(opts) {
-    return AmqpSugarLib._connect(opts)
+  // Todo: Refactor, see e.g. https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/issues/92
+  static publishMessage(connOpts, opts) {
+
+    return AmqpSugarLib._connect(connOpts)
       .then(conn => {
         conn.createChannel()
           .then(channel => {
-            channel.assertExchange(opts.exchange.name, opts.exchange.type, {durable: true});
+            channel.assertExchange(opts.exchange.name, opts.exchange.type, opts.exchange.arguments || {});
             channel.publish(opts.exchange.name, opts.key, encode(opts.payload), opts.options);
-            logger.verbose(`[AMQP] Sent ${opts.key}: ${JSON.stringify(opts.payload, null)}`);
+            if (logDetail) {
+              if (opts.options && opts.options.correlationId) {
+                logger.trace(`[AMQP][publish] ${opts.key}: ${JSON.stringify(opts.payload, null)}, correlationId: ${opts.options.correlationId}`);
+              }
+            }
+            setTimeout(() => {
+              channel.close();
+            }, 500);
 
-            setTimeout(() => { channel.close()}, 500);
-
-            // Todo: Not clear, why we need a setTimeout here ...
-            // setTimeout(() => {
-            //   conn.close();
-            //   logger.verbose('[AMQP]: Connection closed (publishMessage)');
-            // }, 500);
           });
       });
   }
@@ -89,21 +99,24 @@ class AmqpSugarLib {
    */
 
   // Todo(AA): Remove in prod
+  // Todo: Doc needs to be updated
   // eslint-disable-next-line no-unused-vars
-  static subscribeMessage(opts, fn) {
+  static subscribeMessage(connOpts, opts, fn) {
 
-    return AmqpSugarLib._connect(opts)
+    return AmqpSugarLib._connect(connOpts)
       .then(conn => {
 
-        logger.verbose(`[AMQP] Subscribed to queue: ${opts.queue.name}`);
+        logger.trace(`[AMQP] Subscribed to queue: ${opts.queue.name}`);
 
         conn.on('error', err => {
+          // Todo: double-check the logging, we need some test here.
+          logger.error('[AMQP] OK, we got an error with the connection in subscribeMessage', err);
           console.error('[AMQP] OK, we got an error with the connection in subscribeMessage', err);
           return promiseRetry((/* retry, number */) => {
-            // Todo: These logs are not shown ?
+            // Todo: These logs are not shown, needs to be tested ?
             logger.verbose('[AMQP] Trying to re-subscribe to the message');
             console.log('[AMQP] Trying to re-subscribe to the message');
-            return AmqpSugarLib.subscribeMessage(opts);
+            return AmqpSugarLib.subscribeMessage(connOpts, opts);
           });
         });
 
@@ -115,20 +128,22 @@ class AmqpSugarLib {
           channel.assertExchange(opts.exchange.name, opts.exchange.type),
           channel.assertQueue(opts.queue.name, {exclusive: false}),
           channel.bindQueue(opts.queue.name, opts.exchange.name, opts.key),
-          channel.consume(opts.queue.name, msg => {
+          channel.consume(opts.queue.name, msgRaw => {
 
-            const msgContent = JSON.parse(msg.content.toString());
-            logger.verbose(`[AMQP] ${opts.exchange.name}:${opts.queue.name}]`, msgContent);
+            const msgContent = JSON.parse(msgRaw.content.toString());
+            if (logDetail) {
+              logger.trace(`[AMQP][subscribe] ${opts.exchange.name}:${opts.queue.name}`, msgContent);
+            }
 
             if (fn) {
-              fn(msgContent)
+              fn(msgContent, msgRaw)
                 .then(() => {
                   logger.trace(`[AMQP] ack => ${opts.queue.name}`);
-                  channel.ack(msg); // Closing the channel is handled by ack()
+                  channel.ack(msgRaw); // Closing the channel is handled by ack()
                 })
                 .catch(err => {
                   logger.trace(`[AMQP] nack => ${opts.queue.name}`, err);
-                  channel.nack(msg); // Closing the channel is handled by nack()
+                  channel.nack(msgRaw); // Closing the channel is handled by nack()
                 });
             }
           }, {noAck: false})
@@ -139,12 +154,13 @@ class AmqpSugarLib {
       });
   }
 
-  static _fixOptions(opts) {
+  // Todo: defaultConfig can be removed here, but should be part of amqplib-sugar
+  static _fixOptions(connOpts) {
     // logger.verbose('fixOptions:opts', opts);
-    opts = _.defaults(opts, {retry_behavior: {}});
-    opts.retry_behavior = _.defaults(opts.retry_behavior, defaultConfigs.retry_behavior);
+    connOpts = _.defaults(connOpts, {retry_behavior: {}});
+    connOpts.retry_behavior = _.defaults(connOpts.retry_behavior, defaultConfigs.retry_behavior);
     // logger.verbose('fixOptions:opts:afterFix', opts);
-    return opts;
+    return connOpts;
   }
 
   /**
@@ -153,14 +169,14 @@ class AmqpSugarLib {
    * Very similar to amqp.connect, but with the big difference, that if the connection
    * fails, the operation will retry as defined in opts.retry_behavior
    *
-   * @param {rabbitConnectionDef} opts.server - Connection information for the server.
-   * @param {retry_behavior} opts.retry_behavior - Retry behavior for establishing the connection.
+   * @param {rabbitConnectionDef} connOpts.server - Connection information for the server.
+   * @param {retry_behavior} connOpts.retry_behavior - Retry behavior for establishing the connection.
    *
    * @return {Promise} - Returns the promise as defined for amqplib.connect
    */
-  static _connect(opts) {
+  static _connect(connOpts) {
 
-    opts = AmqpSugarLib._fixOptions(opts);
+    connOpts = AmqpSugarLib._fixOptions(connOpts);
     // let valError = AmqpSugarLib._validateConnectOptions(opts);
     // if (valError) {
     //   throw new Error()
@@ -171,12 +187,12 @@ class AmqpSugarLib {
       logger.verbose('Opening a new connection');
       return promiseRetry((retry, number) => {
 
-        opts.retry_behavior.attempts = number;
+        connOpts.retry_behavior.attempts = number;
         if (number >= 2) {
           logger.verbose(`[AMQP] Trying to (re)connect to RabbitMq, attempt number ${number - 1}`);
         }
 
-        return amqp.connect(opts.server)
+        return amqp.connect(connOpts.server)
           .then(conn => {
             connection = conn;
             return Promise.resolve(conn);
@@ -184,9 +200,9 @@ class AmqpSugarLib {
           .catch(retry);
 
       });
-    } else {
-      return Promise.resolve(connection);
     }
+    return Promise.resolve(connection);
+
   }
 
   static _validateConnectOptions(opts) {

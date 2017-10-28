@@ -2,18 +2,85 @@ const Twit = require('twit');
 
 const defaultTwitterConfig = require('./../../config/twitter-config');
 const UsersModel = require('./users.model').Model;
+// const twitLib = require('./../../lib/twit-lib');
 
-class UsersBL {
+const logger = require('winster').instance();
+
+class UsersBl {
 
   /**
    * Return an array of followers for the given user.
+   *
+   * @param {Object} twitOptions
+   * @param {Number} twitOptions.user_id - The user Id to get the followers for.
+   * @param {Number} twitOptions.count - Count of records per page
+   * @param {Number} twitOptions.next_cursor - Twitter's next page' cursor.
+   *
+   * @param twitConfig
    */
-  static getTwitFollowersIds(twitOptions, twitConfig) {
+  static async getTwitFollowersIds(twitOptions, twitConfig) {
 
     let c = twitConfig || defaultTwitterConfig;
 
+    logger.verbose('twitOptions', twitOptions);
+
     let twit = new Twit(c);
-    return twit.get('/followers/ids', twitOptions);
+    return await twit.get('/followers/ids', twitOptions);
+
+  }
+
+  /**
+   * @typedef FollowersIdsResult - Result for fetching followers.
+   *
+   * @param {Array} ids
+   * @param {String} next_cursor
+   * @param {Array} errors
+   */
+
+  /**
+   *
+   * @param twitOptions
+   * @param twitConfig
+   * @returns {Promise.<FollowersIdsResult>}
+   */
+  static async getTwitFollowersIdsTillEnd(twitOptions, twitConfig) {
+
+    let c = twitConfig || defaultTwitterConfig;
+
+    logger.verbose('twitOptions', twitOptions);
+
+    let result = {
+      ids: [],
+      next_cursor: 0,
+      errors: []
+    };
+
+    let twit = new Twit(c);
+    let t = await twit.get('/followers/ids', twitOptions);
+
+    console.log('t', t);
+
+    result.ids = t.data.ids;
+
+    return result;
+
+  }
+
+  /**
+   * Fetch the twitter_id either from the database or from Twitter.
+   *
+   * @param screen_name
+   *
+   * @returns {Promise.<void>}
+   */
+  static async getTwitterId(screen_name) {
+    let dbUser = await UsersBl.get({screen_name});
+    if (dbUser && dbUser._doc) {
+      return dbUser.twitter_id;
+    }
+    let twitUser = await UsersBl.getTwitUser({screen_name});
+    // Todo: rate limit needs to be handled here ...
+    return twitUser.data.id;
 
   }
 
@@ -41,19 +108,10 @@ class UsersBL {
    * @param {Boolean} convertToModel - whether to convert the user (from a Twitter result) to a mongoose model.
    * @return {Promise}
    */
-  static upsert(user, convertToModel) {
-
-    let data = null;
-
-    // Todo: Don't really like that, not really self-explanatory
-    if (convertToModel) {
-     data = UsersBL.twitToModel(user);
-    } else {
-      data = user;
-    }
+  static upsert(user) {
 
     return UsersModel
-      .findOneAndUpdate({twitter_id: data.twitter_id}, data, {new: true, upsert: true, setDefaultsOnInsert: true})
+      .findOneAndUpdate({twitter_id: user.twitter_id}, user, {new: true, upsert: true, setDefaultsOnInsert: true})
       .exec();
   }
 
@@ -90,6 +148,15 @@ class UsersBL {
   }
 
   /**
+   * Returns the total amount of records in the Users table
+   */
+  static count() {
+    return UsersModel
+      .count()
+      .exec();
+  }
+
+  /**
    * Remove all users.
    */
   static removeAll() {
@@ -100,4 +167,4 @@ class UsersBL {
 
 }
 
-module.exports = UsersBL;
+module.exports = UsersBl;

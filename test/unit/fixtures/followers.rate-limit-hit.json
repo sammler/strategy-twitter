@@ -1,0 +1,17 @@
+{
+  "data": {
+    "errors": [
+      {
+        "message": "Rate limit exceeded",
+        "code": 88
+      }
+    ]
+  },
+  "resp": {
+    "headers": {
+      "x-rate-limit-limit": "15",
+      "x-rate-limit-remaining": "0",
+      "x-rate-limit-reset": "1509227519"
+    }
+  }
+}

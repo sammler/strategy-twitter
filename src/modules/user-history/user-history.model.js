@@ -10,7 +10,6 @@ const schema = new Schema({
     type: Schema.Types.Number,
     required: true
   },
-  // Todo: Should be renamed to date_utc
   date_utc: {
     type: Schema.Types.Date,
     required: true
@@ -26,14 +25,12 @@ const schema = new Schema({
   listed_count: {
     type: Schema.Types.Number,
     required: true
-
   },
   followers_count: {
     type: Schema.Types.Number,
     required: true
   },
-  // Todo: We should probably rename this to last_sync_utc_ts to prevent confusion
-  last_sync_ts: {
+  last_sync_utc_ts: {
     type: Schema.Types.Date,
     required: true,
     default: Lib.nowUtc()

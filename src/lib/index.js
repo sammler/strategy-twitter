@@ -11,14 +11,15 @@ class Lib {
   }
 
   // Todo: Does not seem to work properly ???
-  static PromiseDelay(ms) {
-
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve();
-      }, ms);
-    });
-  }
+  // Todo: To be deleted, we use the package promise-delay instead ...
+  // static PromiseDelay(ms) {
+  //
+  //   return new Promise(resolve => {
+  //     setTimeout(() => {
+  //       resolve();
+  //     }, ms);
+  //   });
+  // }
 
   /**
    * Convert the Posix/epoch timestamp to a JavaScript date.

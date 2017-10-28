@@ -13,15 +13,18 @@ const schema = new Schema({
   follower_id: {
     type: Schema.Types.Number
   },
+  // Todo(AAA): Should be renamed to last_check_utc_ts
   last_check: {
     type: Schema.Types.Date,
     required: true
   },
+  // Todo(AAA): Should be renamed to start_date_utc
   start_date: {
     type: Schema.Types.Date,
     required: true,
     default: Lib.startOfDayUtc()
   },
+  // Todo(AAA): Should be renamed to end_date_utc
   end_date: {
     type: Schema.Types.Date
   }

@@ -21,6 +21,7 @@ describe('Testing intersection of Arrays', function () {
     expect(diff).to.be.eql([4]);
   });
 
+  // Todo: as we have taken a completely different approach in the implementation, this can potentially be removed.
   /**
    * Only works if --max-old-space-size=4096 is set as node option
    */

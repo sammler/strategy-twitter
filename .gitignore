@@ -7,6 +7,7 @@ log-test.log
 .vscode
 .idea
 /**/.npm
+coverage
 
 docker-compose.stage.yml
 
@@ -30,5 +31,3 @@ bower_components
 vendor
 temp
 tmp
-TODO.md
-

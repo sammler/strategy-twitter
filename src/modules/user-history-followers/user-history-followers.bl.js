@@ -6,6 +6,8 @@ class UserHistoryFollowersBL {
   /**
    * Inserts or updates a new user-history-followers entry.
    *
+   * If the record already exists, `last_check` will be updated with the last date (utc)
+   *
    * @description
    *
    * @param {Object} item
@@ -61,7 +63,7 @@ class UserHistoryFollowersBL {
   }
 
   /**
-   * Get those users who followed and at un-followed (does not indicate if the have re-followed)
+   * Get those users who followed and then un-followed (does not indicate if the have re-followed)
    * @param twitter_id
    */
   static getUnFollowers(twitter_id) {
@@ -111,7 +113,6 @@ class UserHistoryFollowersBL {
       .remove({})
       .exec();
   }
-
 }
 
 module.exports = UserHistoryFollowersBL;

@@ -26,7 +26,7 @@ class AppServer {
     routesConfig.init(this.app);
 
     // Todo(AAA): A hack to test ...
-    this._initRabbitMQ();
+    // this._initRabbitMQ();
   }
 
   /**
@@ -36,11 +36,11 @@ class AppServer {
    *
    * @private
    */
-  _initSubscribers() {
-    subscriberConfig.init();
+  async _initSubscribers() {
+    return await subscriberConfig.init();
   }
 
-  async _initRabbitMQ() {
+  async _initRabbitMQConnection() {
     return await AmqpSugar._connect(this.config.RABBITMQ_URI);
   }
 
@@ -82,14 +82,11 @@ class AppServer {
     });
   }
 
-  stop() {
-    this.mongooseConnection.disconnect()
-      .then(() => {
-        if (this.server) {
-          this.server.close();
-        }
-      })
-      .catch(err => this.logger.error(err));
+  async stop() {
+    await this.mongooseConnection.disconnect();
+    if (this.server) {
+      this.server.close();
+    }
   }
 }
 

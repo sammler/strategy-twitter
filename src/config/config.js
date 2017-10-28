@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   PORT: process.env.PORT || 3000,
   MONGOOSE_CONNECTION: {
@@ -5,6 +7,17 @@ module.exports = {
     port: process.env.MONGODB_PORT || 27017,
     database: process.env.MONGODB_DATABASE || 'SAMMLER_STRATEGY_TWITTER--DEV'
   },
+  RABBITMQ_CONNECTION: {
+    server: process.env.RABBITMQ_URI || 'amqp://guest:guest@localhost:5672',
+    retry_behavior: {
+      enabled: true,
+      attempts: 0,
+      retries: 10,
+      interval: 10000
+    }
+  },
+
+  // Todo: Can be removed
   RABBITMQ_URI: process.env.RABBITMQ_URI || 'amqp://guest:guest@localhost:5672',
   intervals: {
     // Sync interval in minutes
@@ -12,5 +25,6 @@ module.exports = {
 
     // Sync interval in minutes
     SYNC_USER_HISTORY_INTERVAL: process.env.SYNC_USER_HISTORY_INTERVAL || 24
-  }
+  },
+  MESSAGE_TOPOLOGY_FILE: path.join(__dirname, './msg-topology-new.yml')
 };

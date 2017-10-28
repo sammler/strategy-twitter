@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: node:8.6.0
+      - image:
     working_directory: ~/app
     environment:
       DOCKER_REPO: sammlerio/strategy-twitter

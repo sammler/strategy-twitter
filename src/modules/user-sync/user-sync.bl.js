@@ -1,10 +1,7 @@
-const logger = require('winster').instance();
-// const Lib = require('./../../lib');
 const UsersBl = require('./../../modules/users/users.bl');
 const moment = require('moment');
-// eslint-disable-next-line no-unused-vars
-const AmqpSugar = require('./../../lib/amqplib-sugar');
 const config = require('./../../config/config');
+const _ = require('lodash');
 
 class UserSyncBl {
 
@@ -12,6 +9,7 @@ class UserSyncBl {
     return config.intervals.SYNC_USER_INTERVAL;
   }
 
+  // Todo: Should be move to somewhere else, that's re-usable for many other areas.
   /**
    * Returns how old a record is (expressed in hours).
    *
@@ -31,58 +29,76 @@ class UserSyncBl {
   }
 
   /**
+   * @typedef {Object} SyncUserResult
+   * @property {String} status - The status of the sync operation, can be 'created', 'updated', 'no-action' or 'rate-limit-hit'.
+   * @property {Object} data - The result object.
+   * @property {Object} data.user - The user object (after upserting to the database).
+   * @property {Object} data.twit-response - The Twitter response.
+   */
+
+  /**
    * Sync a given user.
    *
-   * @description
-   *
-   * 1) Check if the user exists, if not, fetch the user from Twitter and store it.
-   * 2)
+   * 1) Check if the user exists, if not, fetch the user from Twitter and store it. Will then return `status: 'created'`.
+   * 2) If a user exists and wasn't updated within the last 24 hours (`SYNC_USER_INTERVAL`), then the user will be updated. Will then return `status: 'updated'`
+   * 3) If a user exists and was updated within the last 24 hours (`SYNC_USER_INTERVAL`), then `status: 'no-action'` will be returned.
    *
    * @param {object} opts - Arguments to pass to syncUser.
    * @param {string} opts.screen_name - The Twitter screen name of the user.
    *
-   * @returns {*}
+   * @returns {SyncUserResult} result - The result of the sync process.
    */
   // eslint-disable-next-line
   static async syncUser(opts) {
 
-    const logPrefix = `[syncUser:${opts.screen_name}]`;
-    logger.verbose('syncUser.args: ', opts);
-
+    let status = 'no-action';
+    let errors = null;
     let user = await UsersBl.get({screen_name: opts.screen_name});
 
-    // Only fetch an update of the user if the user's record is older than SYNC_USER_INTERVAL
-    if (!user || UserSyncBl.howOld(user, 'last_sync_ts', 'hours') >= UserSyncBl.SYNC_USER_INTERVAL) {
-      logger.verbose(`${logPrefix} OK, we have to fetch the user`);
-      let twitUser = await UsersBl.getTwitUser({screen_name: opts.screen_name});
-      // logger.verbose(`${logPrefix} twitUser`, twitUser);
-      // Todo(AA): Here we have to handle the case that the rate-limit is exceeded ...
-      user = await UsersBl.upsert(twitUser.data);
-      // logger.verbose(`${logPrefix} user`, user);
-    } else {
-      logger.verbose(`${logPrefix} We already have a user`);
+    if (!user) {
+      status = 'created';
+      // Only fetch an update of the user if the user's record is older than SYNC_USER_INTERVAL
+    } else if (UserSyncBl.howOld(user, 'last_sync_utc_ts', 'hours') >= UserSyncBl.SYNC_USER_INTERVAL) {
+      status = 'updated';
     }
 
-    // OK, we have a user now, great, let's proceed
-    logger.verbose(`${logPrefix} We have a user now:`, {screen_name: user.screen_name, _id: user._id.toString()});
-
-    logger.verbose(`${logPrefix} Let's publish a new event to RabbitMQ`);
-
-    // eslint-disable-next-line no-unused-vars
-    let optsSyncHistory = {
-      server: config.RABBITMQ_URI,
-      exchange: {
-        type: 'topic',
-        name: 'twitter'
-      },
-      key: 'twitter.cmd.sync.user-history',
-      payload: {
-        screen_name: opts.screen_name
+    if (['created', 'updated'].indexOf(status) > -1) {
+      try {
+        user = await UserSyncBl._twitUpdateUser(opts.screen_name);
+      } catch (ex) {
+        status = 'error';
+        errors = ex.data.errors;
+        if (_.find(ex.data.errors, {code: 88})) {
+          status = 'error-rate-limit-hit';
+        }
       }
-    };
+    }
 
-    // Todo: Should be moved to the listener
-    return await AmqpSugar.publishMessage(optsSyncHistory);
+    return {
+      errors,
+      user,
+      status
+    };
+  }
+
+  /**
+   * Fetch the user from Twitter, convert to the model and upsert to the DB.
+   *
+   * @param {string} screen_name - Twitter's screen_name.
+   * @returns {Promise.<*|ErrorObject>}
+   *
+   * @private
+   */
+  static async _twitUpdateUser(screen_name) {
+    let twitUserResult = await UsersBl.getTwitUser({screen_name});
+
+    // Here we have to check, whether the rate limit has been hit
+    if (twitUserResult.data.errors) {
+      throw twitUserResult.data.errors;
+    }
+
+    let userObj = UsersBl.twitToModel(twitUserResult.data);
+    return await UsersBl.upsert(userObj);
   }
 
 }
