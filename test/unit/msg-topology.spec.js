@@ -5,7 +5,7 @@ function getT() {
   return new MsgTopology({topology_file: path.join(__dirname, './fixtures/msg-topology.yml')});
 }
 
-describe.only('MSG-TOPOLOGY', () => {
+describe('MSG-TOPOLOGY', () => {
 
   it('has some methods', () => {
     let msgTopology = new MsgTopology();
@@ -24,7 +24,7 @@ describe.only('MSG-TOPOLOGY', () => {
     expect(t).to.have.a.property('topology');
   });
 
-  it.only('.getExchange() => returns a single exchange', () => {
+  it('.getExchange() => returns a single exchange', () => {
     let t = getT();
     let e = t.getExchange('cmd.sync.user');
     console.log(e);
