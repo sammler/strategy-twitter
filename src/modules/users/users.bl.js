@@ -2,6 +2,7 @@ const Twit = require('twit');
 
 const defaultTwitterConfig = require('./../../config/twitter-config');
 const UsersModel = require('./users.model').Model;
+// const twitLib = require('./../../lib/twit-lib');
 
 const logger = require('winster').instance();
 
@@ -14,6 +15,7 @@ class UsersBl {
    * @param {Number} twitOptions.user_id - The user Id to get the followers for.
    * @param {Number} twitOptions.count - Count of records per page
    * @param {Number} twitOptions.next_cursor - Twitter's next page' cursor.
+   *
    * @param twitConfig
    */
   static async getTwitFollowersIds(twitOptions, twitConfig) {
@@ -28,18 +30,58 @@ class UsersBl {
   }
 
   /**
-   * Fetch the twitter_id either from the database or from twitter
+   * @typedef FollowersIdsResult - Result for fetching followers.
+   *
+   * @param {Array} ids
+   * @param {String} next_cursor
+   * @param {Array} errors
+   */
+
+  /**
+   *
+   * @param twitOptions
+   * @param twitConfig
+   * @returns {Promise.<FollowersIdsResult>}
+   */
+  static async getTwitFollowersIdsTillEnd(twitOptions, twitConfig) {
+
+    let c = twitConfig || defaultTwitterConfig;
+
+    logger.verbose('twitOptions', twitOptions);
+
+    let result = {
+      ids: [],
+      next_cursor: 0,
+      errors: []
+    };
+
+    let twit = new Twit(c);
+    let t = await twit.get('/followers/ids', twitOptions);
+
+    console.log('t', t);
+
+    result.ids = t.data.ids;
+
+    return result;
+
+  }
+
+  /**
+   * Fetch the twitter_id either from the database or from Twitter.
+   *
    * @param screen_name
+   *
    * @returns {Promise.<void>}
    */
   static async getTwitterId(screen_name) {
     let dbUser = await UsersBl.get({screen_name});
     if (dbUser && dbUser._doc) {
       return dbUser.twitter_id;
-    } 
+    }
     let twitUser = await UsersBl.getTwitUser({screen_name});
+    // Todo: rate limit needs to be handled here ...
     return twitUser.data.id;
-    
+
   }
 
   /**

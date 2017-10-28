@@ -36,8 +36,8 @@ class AppServer {
    *
    * @private
    */
-  _initSubscribers() {
-    subscriberConfig.init();
+  async _initSubscribers() {
+    return await subscriberConfig.init();
   }
 
   async _initRabbitMQConnection() {

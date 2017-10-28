@@ -1,16 +1,20 @@
 const _ = require('lodash');
 const AmqpSugar = require('./../../lib/amqplib-sugar');
 const config = require('./../../config/config');
-const logger = require('winster').instance();
+const logger = require('winster').instance(); // eslint-disable-line no-unused-vars
 const msgTopology = require('./../../config/msg-topology');
 const Joi = require('joi');
 
 const UserFollowersSyncBl = require('./../../../src/modules/user-followers-sync/user-followers-sync.bl');
 
-class UserFollowersSyncSubcriber {
+class UserFollowersSyncSubscriber {
 
-  static init() {
-    UserFollowersSyncSubcriber.subscriber();
+  static get enabled() {
+    return true;
+  }
+
+  static async init() {
+    return await UserFollowersSyncSubscriber.subscriber();
   }
 
   static async listener(msgContent, msgRaw) {
@@ -18,10 +22,10 @@ class UserFollowersSyncSubcriber {
     const logPrefix = `[syncUserHistory:${msgContent.screen_name}]`; // eslint-disable-line no-unused-vars
 
     try {
-      UserFollowersSyncSubcriber._validateMsg();
-      let result = UserFollowersSyncBl.syncUserFollowers();
+      UserFollowersSyncSubscriber._validateMsg();
+      let result = await UserFollowersSyncBl.syncUserFollowers();
 
-      await UserFollowersSyncSubcriber._publishEvents({
+      await UserFollowersSyncSubscriber._publishEvents({
         status: result.status,
         result: {
           screen_name: result.user_history.screen_name
@@ -35,7 +39,7 @@ class UserFollowersSyncSubcriber {
 
     } catch (err) {
       // logger.error(`${logPrefix} publish an unexpected error`, err);
-      await UserFollowersSyncSubcriber._publishError({
+      await UserFollowersSyncSubscriber._publishError({
         status: 'error',
         result: err,
         correlationId: msgRaw.properties.correlationId
@@ -73,14 +77,12 @@ class UserFollowersSyncSubcriber {
    *
    */
   // Todo(doc)
-  static subscriber() {
+  static async subscriber() {
 
     const subOpts = _.find(msgTopology, {key: 'twitter.cmd.sync.user-followers'});
 
-    AmqpSugar.subscribeMessage(config.RABBITMQ_CONNECTION, subOpts, UserFollowersSyncSubcriber.listener)
-      .catch(err => {
-        logger.error(`Error subscribing to ${subOpts.queue.name}`, err);
-      });
+    return await AmqpSugar.subscribeMessage(config.RABBITMQ_CONNECTION, subOpts, UserFollowersSyncSubscriber.listener);
+
   }
 
   static async _publishEvents(msg) {
@@ -105,7 +107,7 @@ class UserFollowersSyncSubcriber {
   }
 
   static async _publishError(msg) {
-    return await UserFollowersSyncSubcriber._publishEvents(msg);
+    return await UserFollowersSyncSubscriber._publishEvents(msg);
   }
 
   static async _publishNextSteps() {
@@ -114,4 +116,4 @@ class UserFollowersSyncSubcriber {
 
 }
 
-module.exports = UserFollowersSyncSubcriber;
+module.exports = UserFollowersSyncSubscriber;

@@ -9,7 +9,11 @@ function init() {
   subscribers.forEach(s => {
     logger.trace('Registering subscriber', s);
     let subscriber = require(s);
-    subscriber.init();
+    if (subscriber.enabled) {
+      subscriber.init();
+    } else {
+      logger.trace('--> subscriber is disabled');
+    }
   });
 }
 
