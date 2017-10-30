@@ -29,7 +29,9 @@ class UserFollowersSyncBl {
   static async syncUserFollowers(opts, twitConfig) {
 
     let result = {
-      status: 'unknown'
+      status: 'unknown',
+      opts: opts,
+      twitConfig
     };
 
     // If we don't have a twitter_id, let's fetch it

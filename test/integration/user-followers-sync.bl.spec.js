@@ -34,7 +34,8 @@ describe('INTEGRATION => user-followers-sync.bl', () => {
 
   describe('syncUserFollowers', () => {
 
-    it('fetches only one record - as defined in params', async () => {
+    // Todo: Move to unit tests
+    xit('fetches only one record - as defined in params', async () => {
 
       let result = await UserFollowersSyncBl.syncUserFollowers({screen_name: screen_name, user_id: twitter_id, count: 1});
       expect(result.data.ids).to.exist;
@@ -43,7 +44,8 @@ describe('INTEGRATION => user-followers-sync.bl', () => {
 
     });
 
-    it('fetching the next record doesn\'t needs the original count parameter', async () => {
+    // Todo: Move to unit tests
+    xit('fetching the next record doesn\'t needs the original count parameter', async () => {
 
       let first = await UserFollowersSyncBl.syncUserFollowers({screen_name: screen_name, user_id: twitter_id, count: 1});
       let second = await UserFollowersSyncBl.syncUserFollowers({user_id: twitter_id, next_cursor: first.data.next_cursor, count: 1});
