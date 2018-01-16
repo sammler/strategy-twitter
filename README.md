@@ -1,5 +1,7 @@
 # strategy-twitter
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/sammler/strategy-twitter.svg)](https://greenkeeper.io/)
+
 > Sammler.io strategy for twitter.
 
 Just a prototype so far. Stay tuned.
