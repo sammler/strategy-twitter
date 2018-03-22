@@ -52,7 +52,7 @@
     "mongoose-timestamp": "^0.6.0",
     "promise-retry": "^1.1.1",
     "sammler-nodelib-logger": "^0.2.1",
-    "swagger-ui-express": "^2.0.8",
+    "swagger-ui-express": "^3.0.1",
     "twit": "^2.2.9",
     "uuid": "^3.1.0",
     "winster": "^0.2.7"
