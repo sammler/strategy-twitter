@@ -34,13 +34,8 @@ exchanges:
       next_cursor: "{{next_cursor}}"
       count: "{{count}}"
 
-
-
   - id: cmd.sync.user-history
     key: twitter.cmd.sync-user-history
-
-
-
 
 queues:
   - id: sync-user

@@ -24,7 +24,7 @@ class AmqpSugarLib {
   /**
    * RabbitMQ Server definition.
    *
-   * @typedef {string} rabbitConnectionDef - Connection string of the server.
+   * @typedef {string|object} rabbitConnectionDef - Connection string of the server.
    */
 
   // Todo: Doc needs to be revisited
@@ -100,6 +100,8 @@ class AmqpSugarLib {
 
   // Todo(AA): Remove in prod
   // Todo: Doc needs to be updated
+  // Todo: Move to amqpsugar-lib
+  // Todo: Make it async
   // eslint-disable-next-line no-unused-vars
   static subscribeMessage(connOpts, opts, fn) {
 
